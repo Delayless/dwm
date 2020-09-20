@@ -85,7 +85,8 @@ static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
+	/* { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } }, */
+	{ MODKEY,                  XK_apostrophe,  togglescratch,  {.v = scratchpadcmd } },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },
