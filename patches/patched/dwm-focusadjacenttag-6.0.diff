@@ -43,7 +43,6 @@ diff -up a/dwm.c b/dwm.c
  static void tagmon(const Arg *arg);
 +static void tagtoleft(const Arg *arg);
 +static void tagtoright(const Arg *arg);
- static int textnw(const char *text, unsigned int len);
  static void tile(Monitor *);
  static void togglebar(const Arg *arg);
 @@ -245,6 +247,8 @@ static void updatewindowtype(Client *c);
@@ -58,7 +57,7 @@ diff -up a/dwm.c b/dwm.c
 @@ -1690,6 +1694,28 @@ tagmon(const Arg *arg) {
  	sendmon(selmon->sel, dirtomon(arg->i));
  }
- 
+
 +void
 +tagtoleft(const Arg *arg) {
 +	if(selmon->sel != NULL
@@ -87,7 +86,7 @@ diff -up a/dwm.c b/dwm.c
 @@ -2052,6 +2078,28 @@ view(const Arg *arg) {
  	arrange(selmon);
  }
- 
+
 +void
 +viewtoleft(const Arg *arg) {
 +	if(__builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
