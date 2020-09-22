@@ -80,6 +80,7 @@ static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "google-chrome-stable", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+static const char *screenshotcmd[] = { "flameshot", "gui", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
@@ -88,6 +89,7 @@ static Key keys[] = {
 	/* { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } }, */
 	{ MODKEY,                  XK_apostrophe,  togglescratch,  {.v = scratchpadcmd } },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
+	{ 0,                        XK_Print,      spawn,          {.v = screenshotcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstackvis,  {.i = -1 } },
