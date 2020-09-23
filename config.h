@@ -7,7 +7,7 @@ static const unsigned int gappih    = 10;       /* horiz inner gap between windo
 static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
 static const unsigned int gappoh    = 5;       /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov    = 10;       /* vert outer gap between windows and screen edge */
-static const int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
+static const int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
 static const unsigned int systrayspacing = 0;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
@@ -92,8 +92,6 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_equal,  incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_minus,  setmfact,       {.f = -0.05} },
 	{ MODKEY,                       XK_equal,  setmfact,       {.f = +0.05} },
-	{ MODKEY|Mod1Mask,              XK_0,      togglegaps,     {0} },
-	{ MODKEY|Mod1Mask|ShiftMask,    XK_0,      defaultgaps,    {0} },
 	{ MODKEY|ShiftMask,             XK_Return, zoom,           {0} },
 	{ MODKEY,                       XK_Tab,    view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
