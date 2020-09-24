@@ -15,7 +15,7 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
-static const char *fonts[]          = { "monospace:size=14" };
+static const char *fonts[]          = { "monospace:size=18" };
 static const char dmenufont[]       = "monospace:size=14";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -31,7 +31,10 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+/*          */
+static const char *tags[] = { "\uf8a3", "\uf8a6", "\uf8a9", "\uf8ac", "\uf8af", "\uf8b2", "\uf8b5", "\uf8b8", "\uf8bb" };
+/*        嗢 */
+static const char *tagsalt[] = { "\uf489", "\ue62b", "\uf7a3", "\uf268", "\uf1c1", "\uf198", "\uf886", "\ufa7b", "\uf019" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -40,7 +43,7 @@ static const Rule rules[] = {
 	 */
 	/* class             instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",            NULL,       NULL,       0,            1,           -1 },
-	{ "Google-chrome",   NULL,       NULL,       1 << 8,       0,           -1 },
+	{ "Google-chrome",   NULL,       NULL,       1 << 3,       0,           -1 },
 };
 
 /* layout(s) */
@@ -75,12 +78,16 @@ static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
 static const char *screenshotcmd[] = { "flameshot", "gui", NULL };
 static const char *rofirun[] = { "rofi", "-show", "run", NULL };
-static const char *rofiwindow[] = { "rofi", "-show", "window", NULL };
+static const char *rofiwindow[] = { "rofi", "-show", "combi", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_d,      spawn,          {.v = rofirun } },
 	{ MODKEY,                       XK_w,      spawn,          {.v = rofiwindow } },
+	/* { 0,			  XF86XK_AudioLowerVolume, spawn,          SHCMD("amixer set Master 5%-") }, */
+	/* { 0,			  XF86XK_AudioRaiseVolume, spawn,          SHCMD("amixer set Master 5%+") }, */
+	/* { 0,			  XF86XK_AudioMute,        spawn,          SHCMD("amixer set Master toggle") }, */
+	{ MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	/* { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } }, */
 	{ MODKEY,                  XK_apostrophe,  togglescratch,  {.v = scratchpadcmd } },
@@ -122,6 +129,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_period, focusmon,       {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_comma,  tagmon,         {.i = -1 } },
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
+	{ MODKEY,                       XK_e,      togglealttag,   {0} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
