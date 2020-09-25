@@ -132,7 +132,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 	/* { MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } }, */
 	{ MODKEY,                  XK_apostrophe,  togglescratch,  {.v = scratchpadcmd } },
-    { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
+	{ MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
 	{ 0,                            XK_Print,  spawn,          {.v = screenshotcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstackvis,  {.i = +1 } },
@@ -154,7 +154,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY|ControlMask,           XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-    { MODKEY,                       XK_space,  focusmaster,    {0} },
+	{ MODKEY,                       XK_space,  focusmaster,    {0} },
 	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
