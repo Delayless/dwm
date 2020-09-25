@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 
 /* appearance */
-static const unsigned int borderpx  = 3;        /* border pixel of windows */
+static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
 static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
@@ -15,35 +15,75 @@ static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 0;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
-static const char *fonts[]          = { "monospace:size=18" };
-static const char dmenufont[]       = "monospace:size=14";
+/* static const char *fonts[]          = {"Fantasque Sans Mono Nerd Font:size=15:antialias=true:autohint=true"}; */
+static const char *fonts[]          = {"FiraCode Nerd Font:size=15"};
+static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
 static const char col_gray4[]       = "#eeeeee";
 static const char col_cyan[]        = "#384B54";
 static const char col_border[]      = "#2F98ED";
+// gruvbox
+static const char col_gb_bg[]       = "#282828";
+static const char col_gb_fg[]       = "#ebdbb2";
+
+static const char col_gb_red1[]     = "#cc241d";
+static const char col_gb_red2[]     = "#fb4934";
+
+static const char col_gb_green1[]   = "#98971a";
+static const char col_gb_green2[]   = "#b8bb26";
+
+static const char col_gb_yellow1[]  = "#d79921";
+static const char col_gb_yellow2[]  = "#fabd2f";
+
+static const char col_gb_blue1[]    = "#458588";
+static const char col_gb_blue2[]    = "#83a598";
+
+static const char col_gb_purple1[]  = "#b16286";
+static const char col_gb_purple2[]  = "#83869b";
+
+static const char col_gb_aqua1[]    = "#689d6a";
+static const char col_gb_aqua2[]    = "#8ec07c";
+
+static const char col_gb_gray1[]    = "#a89984";
+static const char col_gb_gray2[]    = "#928374";
+
+static const char col_gb_orange1[]  = "#d65d0e";
+static const char col_gb_orange2[]  = "#fe8019";
+// gruvbox
 static const char *colors[][3]      = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_border},
-	[SchemeHid]  = { col_cyan,  col_gray1, col_border},
+	/*                      fg                 bg          border   */
+	[SchemeHid]      = { col_cyan,         col_gray1,    col_border},
+	[SchemeNorm]     = { col_gb_gray2,     col_gb_bg,    col_gb_bg },
+	[SchemeSel]      = { col_gb_orange2,   col_gb_bg,    col_gb_orange2 },
+	[SchemeSel2]     = { col_gb_fg,        col_gb_bg,    col_gb_bg },
+	[SchemeUrgent]   = { col_gb_fg,        col_gb_bg,    col_gb_bg },
+	[SchemeTitle]    = { col_gb_fg,        col_gb_bg,    col_gb_bg },
+	[SchemeLt]       = { col_gb_orange2,   col_gb_bg,    col_gb_bg },
+	[SchemeNotify]   = { col_gb_red1,      col_gb_bg,    col_gb_bg },
+	[SchemeStatus]   = { col_gb_aqua2,     col_gb_bg,    col_gb_bg },
+	[SchemeIndOff]   = { col_gb_green2,    col_gb_bg,    col_gb_bg },
+	[SchemeIndOn]    = { col_gb_blue2,     col_gb_bg,    col_gb_bg },
 };
 
 /* tagging */
-/*          */
-static const char *tags[] = { "\uf8a3", "\uf8a6", "\uf8a9", "\uf8ac", "\uf8af", "\uf8b2", "\uf8b5", "\uf8b8", "\uf8bb" };
 /*        嗢 */
-static const char *tagsalt[] = { "\uf489", "\ue62b", "\uf7a3", "\uf268", "\uf1c1", "\uf198", "\uf886", "\ufa7b", "\uf019" };
+static const char *tags[] = { "\uf489", "\ue62b", "\uf7a3", "\uf268", "\uf1c1", "\uf198", "\uf886", "\ufa7b", "\uf019" };
+ /* ❶ ❷ ❸ ❹ ❺ ❻ ❼ ❽ ❾ */
+/* static const char *tagsalt[] = { "\u2776", "\u2777", "\u2778", "\u2779", "\u277a", "\u277b", "\u277c", "\u277d", "\u277e" }; */
+/*          */
+static const char *tagsalt[] = { "\uf8a3", "\uf8a6", "\uf8a9", "\uf8ac", "\uf8af", "\uf8b2", "\uf8b5", "\uf8b8", "\uf8bb" };
 
 static const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class             instance    title       tags mask     isfloating   monitor */
-	{ "Gimp",            NULL,       NULL,       0,            1,           -1 },
-	{ "Google-chrome",   NULL,       NULL,       1 << 3,       0,           -1 },
+	/* class                   instance     title       tags mask     isfloating   monitor */
+	{ "Gimp",                  NULL,        NULL,       0,            1,           -1 },
+	{ "netease-cloud-music",   NULL,        NULL,       1 << 6,       0,           -1 },
+	{ "Google-chrome",         NULL,        NULL,       1 << 3,       0,           -1 },
 };
 
 /* layout(s) */
@@ -53,9 +93,10 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	{ "Tile",     tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[M]",      monocle },
+	/* 響     﩯 */
+	{ "\ufa69",    tile },    /* first entry is default */
+	{ "\uf2d2",    NULL },    /* no layout function means floating behavior */
+	{ "\uf2d0",    monocle },
 };
 
 /* key definitions */
