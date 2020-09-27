@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include "gaplessgrid.c"
 
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
@@ -97,6 +98,7 @@ static const Layout layouts[] = {
 	{ "\ufa69",    tile },    /* first entry is default */
 	{ "\uf2d2",    NULL },    /* no layout function means floating behavior */
 	{ "\uf2d0",    monocle },
+	{ "\ufa6f",    gaplessgrid },
 };
 
 /* key definitions */
@@ -155,6 +157,7 @@ static Key keys[] = {
 	{ MODKEY|ControlMask,           XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_space,  focusmaster,    {0} },
+	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY,                       XK_f,      togglefullscr,  {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
