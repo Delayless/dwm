@@ -85,6 +85,7 @@ static const Rule rules[] = {
 	{ "Gimp",                  NULL,        NULL,       0,            1,           -1 },
 	{ "netease-cloud-music",   NULL,        NULL,       1 << 6,       0,           -1 },
 	{ "Google-chrome",         NULL,        NULL,       1 << 3,       0,           -1 },
+	{ "Slack",                 NULL,        NULL,       1 << 5,       0,           -1 },
 };
 
 /* layout(s) */
