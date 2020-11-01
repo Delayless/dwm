@@ -1,6 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 #include "gaplessgrid.c"
 
+#define PROJECT_PATH ~/Projects/Delayless
+#define STR1(PATH) #PATH
+#define STR(PATH) STR1(PATH)
+
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
@@ -132,21 +136,21 @@ static Key keys[] = {
 	/* { 0,      XF86XK_AudioLowerVolume,      spawn,          SHCMD("amixer set Master 5%-") }, */
 	/* { 0,      XF86XK_AudioRaiseVolume,      spawn,          SHCMD("amixer set Master 5%+") }, */
 	/* { 0,             XF86XK_AudioMute,      spawn,          SHCMD("amixer set Master toggle") }, */
-	{ 0,         XF86XK_AudioLowerVolume,      spawn,          SHCMD("~/scripts/volume_down.sh") },
-	{ 0,         XF86XK_AudioRaiseVolume,      spawn,          SHCMD("~/scripts/volume_up.sh") },
-	{ 0,                XF86XK_AudioMute,      spawn,          SHCMD("~/scripts/volume_toggle.sh --toggle") },
-	{ ShiftMask, XF86XK_AudioLowerVolume,      spawn,          SHCMD("~/scripts/volume_toggle.sh --toggle") },
-	{ MODKEY,                      XK_F1,      spawn,          SHCMD("~/scripts/volume_toggle.sh --toggle") },
-	{ MODKEY,                      XK_F2,      spawn,          SHCMD("~/scripts/volume_down.sh") },
-	{ MODKEY,                      XK_F3,      spawn,          SHCMD("~/scripts/volume_up.sh") },
+	{ 0,         XF86XK_AudioLowerVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_down.sh") },
+	{ 0,         XF86XK_AudioRaiseVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_up.sh") },
+	{ 0,                XF86XK_AudioMute,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
+	{ ShiftMask, XF86XK_AudioLowerVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
+	{ MODKEY,                      XK_F1,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
+	{ MODKEY,                      XK_F2,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_down.sh") },
+	{ MODKEY,                      XK_F3,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_up.sh") },
 	{ MODKEY,                     XK_F11,      spawn,          SHCMD("brightnessctl set 10%-") },
 	{ MODKEY,                     XK_F12,      spawn,          SHCMD("brightnessctl set +10%") },
 	{ MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") },
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b") },
-	{ MODKEY,                       XK_p,      spawn,          SHCMD("~/scripts/wallpaper-change.sh") },
-	{ MODKEY,                       XK_y,      spawn,          SHCMD("~/scripts/qwerty.sh") },
-	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD("~/scripts/colemak.sh") },
-	{ MODKEY|ShiftMask,            XK_F4,      spawn,          SHCMD("~/scripts/suspend.sh") },
+	{ MODKEY,                       XK_p,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/wallpaper-change.sh") },
+	{ MODKEY,                       XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/qwerty.sh") },
+	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/colemak.sh") },
+	{ MODKEY|ShiftMask,            XK_F4,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/suspend.sh") },
     { MODKEY,                  XK_Return,      spawn,          {.v = termcmd } },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
     { MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("netease-cloud-music") },

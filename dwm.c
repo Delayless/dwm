@@ -1838,8 +1838,8 @@ run(void)
 void
 runAutostart(void) {
 	/* system("cd ~/scripts; ./autostart_blocking.sh"); */
-	system("~/scripts/autostart_blocking.sh");
-	system("~/scripts/autostart.sh &");
+	system(STR(PROJECT_PATH)"/scripts/autostart_blocking.sh");
+	system(STR(PROJECT_PATH)"/scripts/autostart.sh &");
 }
 
 void
