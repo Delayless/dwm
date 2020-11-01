@@ -902,6 +902,7 @@ drawbar(Monitor *m)
 			urg |= c->tags;
 	}
 	x = 0;
+    /* Draw Tags */
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
 		wdelta = selmon->alttag ? abs(TEXTW(tags[i]) - TEXTW(tagsalt[i])) / 2 : -2;
@@ -913,6 +914,8 @@ drawbar(Monitor *m)
             drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, wdelta + lrpad / 2, (selmon->alttag ? tagsalt[i] : tags[i]), 0);
 		if (occ & 1 << i){
+            /* Draw Notify */
+            /* `sleep 3; echo -e "\a"` then switch to other tag */
             if (urg & 1 << i ) {
                 drw_setscheme(drw, scheme[SchemeNotify]);
                 drw_rect(drw, x + boxw, 0, w - ( 2 * boxw ), boxw - 4, 1, 0);
@@ -924,10 +927,12 @@ drawbar(Monitor *m)
 		}
 		x += w;
 	}
+    /* Draw Layout icon: tile, monocle... */
 	w = blw = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeLt]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
+    /* Draw Title */
 	if ((w = m->ww - tw - stw - x) > bh) {
 		if (n > 0) {
 			int remainder = w % n;
