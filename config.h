@@ -99,11 +99,13 @@ static const int resizehints = 1;    /* 1 means respect size hints in tiled resi
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
-	/* 響     﩯 */
-	{ "\ufa69",    tile },    /* first entry is default */
+	/*      﩯 響☰ */
+	{ "\uf04c",    tile },    /* first entry is default */
 	{ "\uf2d2",    NULL },    /* no layout function means floating behavior */
 	{ "\uf2d0",    monocle },
 	{ "\ufa6f",    gaplessgrid },
+	{ "\ufa69",    bstack },
+	{ "\u2630",    bstackhoriz },
 };
 
 /* key definitions */
@@ -175,6 +177,8 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_f,      setlayout,      {.v = &layouts[1]} },
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },
+	{ MODKEY|ShiftMask,             XK_t,      setlayout,      {.v = &layouts[4]} },
+	{ MODKEY|ControlMask,           XK_t,      setlayout,      {.v = &layouts[5]} },
 	{ MODKEY|ControlMask,       XK_space,      setlayout,      {0} },
 	{ MODKEY|ShiftMask,         XK_space,      togglefloating, {0} },
 	{ MODKEY,                   XK_space,      focusmaster,    {0} },
