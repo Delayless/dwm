@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include "gaplessgrid.c"
+#include "movestack.c"
 
 #define PROJECT_PATH ~/Projects/Delayless
 #define STR1(PATH) #PATH
@@ -161,6 +162,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_j,      movestack,      {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_k,      movestack,      {.i = -1 } },
 	{ MODKEY,                       XK_r,      rotatestack,    {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_r,      rotatestack,    {.i = -1 } },
 	{ MODKEY|ShiftMask,         XK_minus,      incnmaster,     {.i = +1 } },
