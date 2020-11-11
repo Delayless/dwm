@@ -2092,6 +2092,8 @@ spawn(const Arg *arg)
 	if (arg->v == dmenucmd)
 		dmenumon[0] = '0' + selmon->num;
 	selmon->tagset[selmon->seltags] &= ~scratchtag;
+	if ((arg->v == termcmd) && selmon->sel && selmon->sel->isfullscreen)
+		return;
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
