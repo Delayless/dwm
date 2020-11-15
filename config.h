@@ -192,10 +192,10 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_h,      tagtoleft,      {0} },
 	{ MODKEY|ShiftMask,             XK_l,      tagtoright,     {0} },
 	{ MODKEY,                       XK_x,      transfer,       {0} },
-	{ MODKEY,                   XK_comma,      focusmon,       {.i = -1 } },
-	{ MODKEY,                  XK_period,      focusmon,       {.i = +1 } },
-	{ MODKEY|ShiftMask,         XK_comma,      tagmon,         {.i = -1 } },
-	{ MODKEY|ShiftMask,        XK_period,      tagmon,         {.i = +1 } },
+	{ MODKEY,                  XK_period,      focusmon,       {.i = -1 } },
+	{ MODKEY,                   XK_comma,      focusmon,       {.i = +1 } },
+	{ MODKEY|ShiftMask,        XK_period,      tagmon,         {.i = -1 } },
+	{ MODKEY|ShiftMask,         XK_comma,      tagmon,         {.i = +1 } },
 	{ MODKEY,                       XK_e,      togglealttag,   {0} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
