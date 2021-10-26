@@ -139,15 +139,19 @@ static Key keys[] = {
 	/* { 0,      XF86XK_AudioLowerVolume,      spawn,          SHCMD("amixer set Master 5%-") }, */
 	/* { 0,      XF86XK_AudioRaiseVolume,      spawn,          SHCMD("amixer set Master 5%+") }, */
 	/* { 0,             XF86XK_AudioMute,      spawn,          SHCMD("amixer set Master toggle") }, */
+	{ 0,                XF86XK_AudioMute,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
 	{ 0,         XF86XK_AudioLowerVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_down.sh") },
 	{ 0,         XF86XK_AudioRaiseVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_up.sh") },
-	{ 0,                XF86XK_AudioMute,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
-	{ ShiftMask, XF86XK_AudioLowerVolume,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
 	{ MODKEY,                      XK_F1,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
 	{ MODKEY,                      XK_F2,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_down.sh") },
 	{ MODKEY,                      XK_F3,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_up.sh") },
 	{ MODKEY,                     XK_F11,      spawn,          SHCMD("brightnessctl set 10%-") },
 	{ MODKEY,                     XK_F12,      spawn,          SHCMD("brightnessctl set +10%") },
+	{ 0,        XF86XK_MonBrightnessDown,      spawn,          SHCMD("brightnessctl set 10%-") },
+	{ 0,          XF86XK_MonBrightnessUp,      spawn,          SHCMD("brightnessctl set +10%") },
+	// Fn+F7 toggle airplane mode
+	{ 0,                   XF86XK_RFKill,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
+	{ MODKEY,                      XK_F7,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
 	{ MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") },
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b") },
 	{ MODKEY,                       XK_p,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/wallpaper-change.sh") },
