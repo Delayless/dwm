@@ -161,6 +161,7 @@ static Key keys[] = {
     { MODKEY,                  XK_Return,      spawn,          {.v = termcmd } },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
     { MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("netease-cloud-music") },
+    { MODKEY|ControlMask,           XK_l,      spawn,          SHCMD("xtrlock") },
     { 0,                        XK_Print,      spawn,          {.v = screenshotcmd } },
     { MODKEY,              XK_apostrophe,      togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
