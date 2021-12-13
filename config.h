@@ -9,6 +9,7 @@
 /* appearance */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */
 static const unsigned int snap      = 32;       /* snap pixel */
+static const int swallowfloating    = 1;        /* 1 means swallow floating windows by default */
 static const unsigned int gappih    = 10;       /* horiz inner gap between windows */
 static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
 static const unsigned int gappoh    = 5;       /* horiz outer gap between windows and screen edge */
@@ -86,11 +87,15 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class                   instance     title       tags mask     isfloating   monitor */
-	{ "Gimp",                  NULL,        NULL,       0,            1,           -1 },
-	{ "netease-cloud-music",   NULL,        NULL,       1 << 6,       0,           -1 },
-	{ "Google-chrome",         NULL,        NULL,       1 << 3,       0,           -1 },
-	{ "Slack",                 NULL,        NULL,       1 << 5,       0,           -1 },
+	/* class                   instance  title           tags mask  isfloating   monitor */
+	/* class                   instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
+	{ "Gimp",                  NULL,     NULL,           0,         1,          0,           0,        -1 },
+	{ "Google-chrome",         NULL,     NULL,           1 << 3,    0,          0,          -1,        -1 },
+	{ "st-256color",           NULL,     NULL,           0,         0,          1,           0,        -1 },
+	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          0,           0,        -1 },
+	{ "fluent-reader",         NULL,     NULL,           1 << 7,    0,          0,           0,        -1 },
+	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,           0,        -1 },
+	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
 
 /* layout(s) */
@@ -126,7 +131,7 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont,
 static const char *termcmd[]  = { "st", NULL };
 static const char *browsercmd[]  = { "google-chrome-stable", NULL };
 static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "120x34", NULL };
+static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "138x40", NULL };
 static const char *screenshotcmd[] = { "flameshot", "gui", NULL };
 static const char *rofirun[] = { "rofi", "-show", "run", NULL };
 static const char *rofiwindow[] = { "rofi", "-show", "combi", NULL };
