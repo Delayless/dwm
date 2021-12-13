@@ -1,0 +1,266 @@
+diff --git a/config.h b/config.h
+index 3c2b49e..fca889e 100644
+--- a/config.h
++++ b/config.h
+@@ -61,7 +66,6 @@ static const char col_gb_orange2[]  = "#fe8019";
+ // gruvbox
+ static const char *colors[][3]      = {
+ 	/*                      fg                 bg          border   */
+-	[SchemeHid]      = { col_cyan,         col_gray1,    col_border},
+ 	[SchemeNorm]     = { col_gb_gray2,     col_gb_bg,    col_gb_bg },
+ 	[SchemeSel]      = { col_gb_orange2,   col_gb_bg,    col_gb_orange2 },
+ 	[SchemeSel2]     = { col_gb_fg,        col_gb_bg,    col_gb_bg },
+@@ -224,7 +228,6 @@ static Button buttons[] = {
+ 	/* click                event mask      button          function        argument */
+ 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
+ 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+-	{ ClkWinTitle,          0,              Button1,        togglewin,      {0} },
+ 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
+ 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
+ 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
+diff --git a/dwm.c b/dwm.c
+index ab99ee9..0622165 100644
+--- a/dwm.c
++++ b/dwm.c
+@@ -56,7 +56,6 @@
+ #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
+                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
+ #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+-#define HIDDEN(C)               ((getstate(C->win) == IconicState))
+ #define LENGTH(X)               (sizeof X / sizeof X[0])
+ #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
+ #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
+@@ -84,7 +83,7 @@
+
+ /* enums */
+ enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
+-enum { SchemeNorm, SchemeSel, SchemeHid, SchemeTitle, SchemeLt, SchemeStatus, SchemeIndOff, SchemeIndOn, SchemeSel2, SchemeUrgent, SchemeNotify }; /* color schemes */
++enum { SchemeNorm, SchemeSel, SchemeTitle, SchemeLt, SchemeStatus, SchemeIndOff, SchemeIndOn, SchemeSel2, SchemeUrgent, SchemeNotify }; /* color schemes */
+ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
+        NetSystemTray, NetSystemTrayOP, NetSystemTrayOrientation, NetSystemTrayOrientationHorz,
+        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
+@@ -147,8 +146,6 @@ struct Monitor {
+ 	int nmaster;
+ 	int num;
+ 	int by;               /* bar geometry */
+-	int btw;              /* width of tasks portion of bar */
+-	int bt;               /* number of tasks */
+ 	int mx, my, mw, mh;   /* screen size */
+ 	int wx, wy, ww, wh;   /* window area  */
+ 	int gappih;           /* horizontal gap between windows */
+@@ -258,7 +255,6 @@ static void setlayout(const Arg *arg);
+ static void setmfact(const Arg *arg);
+ static void setup(void);
+ static void seturgent(Client *c, int urg);
+-static void showwin(Client *c);
+ static void showhide(Client *c);
+ static void sigchld(int unused);
+ static void spawn(const Arg *arg);
+@@ -277,7 +273,6 @@ static void togglescratch(const Arg *arg);
+ static void toggletag(const Arg *arg);
+ static void toggleview(const Arg *arg);
+ static void transfer(const Arg *arg);
+-static void togglewin(const Arg *arg);
+ static void unfocus(Client *c, int setfocus);
+ static void unmanage(Client *c, int destroyed);
+ static void unmapnotify(XEvent *e);
+@@ -585,25 +580,10 @@ buttonpress(XEvent *e)
+ 			arg.ui = 1 << i;
+ 		} else if (ev->x < x + blw)
+ 			click = ClkLtSymbol;
+-		/* 2px right padding */
+-		else if (ev->x > selmon->ww - (int)TEXTW(stext) + lrpad - 2 - getsystraywidth())
++		else if (ev->x > selmon->ww - (int)TEXTW(stext) - getsystraywidth())
+ 			click = ClkStatusText;
+-		else {
+-			x += blw;
+-			c = m->clients;
+-
+-			if (c) {
+-				do {
+-					if (!ISVISIBLE(c))
+-						continue;
+-					else
+-						x += (1.0 / (double)m->bt) * m->btw;
+-				} while (ev->x > x && (c = c->next));
+-
+-				click = ClkWinTitle;
+-				arg.v = c;
+-			}
+-		}
++		else
++			click = ClkWinTitle;
+ 	} else if ((c = wintoclient(ev->window))) {
+ 		focus(c);
+ 		restack(selmon);
+@@ -613,7 +593,7 @@ buttonpress(XEvent *e)
+ 	for (i = 0; i < LENGTH(buttons); i++)
+ 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
+ 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
+-			buttons[i].func((click == ClkTagBar || click == ClkWinTitle) && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
++			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
+ }
+
+ void
+@@ -944,7 +924,7 @@ dirtomon(int dir)
+ void
+ drawbar(Monitor *m)
+ {
+-	int x, w, tw = 0, stw = 0, n = 0, scm, wdelta;
++	int x, w, tw = 0, stw = 0, wdelta;
+ 	int boxs = drw->fonts->h / 9;
+ 	int boxw = drw->fonts->h / 5 + 2;
+ 	unsigned int i, occ = 0, urg = 0;
+@@ -962,8 +942,6 @@ drawbar(Monitor *m)
+
+ 	resizebarwin(m);
+ 	for (c = m->clients; c; c = c->next) {
+-		if (ISVISIBLE(c))
+-			n++;
+ 		occ |= c->tags;
+ 		if (c->isurgent)
+ 			urg |= c->tags;
+@@ -1001,37 +979,16 @@ drawbar(Monitor *m)
+
+     /* Draw Title */
+ 	if ((w = m->ww - tw - stw - x) > bh) {
+-		if (n > 0) {
+-			int remainder = w % n;
+-			int tabw = (1.0 / (double)n) * w + 1;
+-			for (c = m->clients; c; c = c->next) {
+-				if (!ISVISIBLE(c))
+-					continue;
+-				if (m->sel == c)
+-					scm = SchemeTitle;
+-				else if (HIDDEN(c))
+-					scm = SchemeHid;
+-				else
+-					scm = SchemeNorm;
+-				drw_setscheme(drw, scheme[scm]);
+-
+-				if (remainder >= 0) {
+-					if (remainder == 0) {
+-						tabw--;
+-					}
+-					remainder--;
+-				}
+-				drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+-				x += tabw;
+-			}
++		if (m->sel) {
++			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
++			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
++			if (m->sel->isfloating)
++				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+ 		} else {
+ 			drw_setscheme(drw, scheme[SchemeNorm]);
+ 			drw_rect(drw, x, 0, w, bh, 1, 1);
+ 		}
+ 	}
+-
+-	m->bt = n;
+-	m->btw = w;
+ 	drw_map(drw, m->barwin, 0, 0, m->ww - stw, bh);
+ }
+
+@@ -1101,11 +1058,10 @@ expose(XEvent *e)
+ void
+ focus(Client *c)
+ {
+-	if (!c || !ISVISIBLE(c) || HIDDEN(c))
+-		for (c = selmon->stack; c && (!ISVISIBLE(c) || HIDDEN(c)); c = c->snext);
+-	if (selmon->sel && selmon->sel != c) {
++	if (!c || !ISVISIBLE(c))
++		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
++	if (selmon->sel && selmon->sel != c)
+ 		unfocus(selmon->sel, 0);
+-	}
+ 	if (c) {
+ 		if (c->mon != selmon)
+ 			selmon = c->mon;
+@@ -1415,14 +1371,12 @@ manage(Window w, XWindowAttributes *wa)
+ 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
+ 		(unsigned char *) &(c->win), 1);
+ 	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
+-	if (!HIDDEN(c))
+-		setclientstate(c, NormalState);
++	setclientstate(c, NormalState);
+ 	if (c->mon == selmon)
+ 		unfocus(selmon->sel, 0);
+ 	c->mon->sel = c;
+ 	arrange(c->mon);
+-	if (!HIDDEN(c))
+-		XMapWindow(dpy, c->win);
++	XMapWindow(dpy, c->win);
+ 	if (term)
+ 		swallow(term, c);
+ 	focus(NULL);
+@@ -1551,7 +1505,7 @@ movemouse(const Arg *arg)
+ Client *
+ nexttiled(Client *c)
+ {
+-	for (; c && (c->isfloating || !ISVISIBLE(c) || HIDDEN(c)); c = c->next);
++	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
+ 	return c;
+ }
+
+@@ -1614,16 +1568,6 @@ propertynotify(XEvent *e)
+ void
+ quit(const Arg *arg)
+ {
+-	// fix: reloading dwm keeps all the hidden clients hidden
+-	Monitor *m;
+-	Client *c;
+-	for (m = mons; m; m = m->next) {
+-		if (m) {
+-			for (c = m->stack; c; c = c->next)
+-				if (c && HIDDEN(c)) showwin(c);
+-		}
+-	}
+-
+ 	running = 0;
+ }
+
+@@ -2125,17 +2069,6 @@ seturgent(Client *c, int urg)
+ 	XFree(wmh);
+ }
+
+-void
+-showwin(Client *c)
+-{
+-	if (!c || !HIDDEN(c))
+-		return;
+-
+-	XMapWindow(dpy, c->win);
+-	setclientstate(c, NormalState);
+-	arrange(c->mon);
+-}
+-
+ void
+ showhide(Client *c)
+ {
+@@ -2365,20 +2298,6 @@ toggleview(const Arg *arg)
+ 	}
+ }
+
+-void
+-togglewin(const Arg *arg)
+-{
+-	Client *c = (Client*)arg->v;
+-
+-	if (c == selmon->sel) {
+-		return;
+-	} else {
+-		showwin(c);
+-		focus(c);
+-		restack(selmon);
+-	}
+-}
+-
+ void
+ unfocus(Client *c, int setfocus)
+ {
+diff --git a/patches/patched/dwm-awesomebar-20200907-6.2.diff b/patches/dwm-awesomebar-20200907-6.2.diff
+similarity index 100%
+rename from patches/patched/dwm-awesomebar-20200907-6.2.diff
+rename to patches/dwm-awesomebar-20200907-6.2.diff
