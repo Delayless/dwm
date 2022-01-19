@@ -259,6 +259,7 @@ static void setlayout(const Arg *arg);
 static void setmfact(const Arg *arg);
 static void setup(void);
 static void seturgent(Client *c, int urg);
+static void focusurgent(const Arg *arg);
 static void showwin(Client *c);
 static void showhide(Client *c);
 static void sigchld(int unused);
@@ -989,7 +990,9 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
+	/* wdelta for alternativetags,  */
 	int x, w, tw = 0, stw = 0, n = 0, scm, wdelta;
+	/* activetagindicatorbar */
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 5 + 2;
 	unsigned int i, occ = 0, urg = 0;
@@ -1017,19 +1020,25 @@ drawbar(Monitor *m)
     /* Draw Tags */
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
+		/* alternativetags */
 		wdelta = selmon->alttag ? abs(TEXTW(tags[i]) - TEXTW(tagsalt[i])) / 2 : -2;
+
+		/* draw tags foreground colors */
         if ( m == selmon && selmon->sel && selmon->sel->tags & 1 << i && !(selmon->sel->tags & m->tagset[m->seltags] & 1 << i) )
             drw_setscheme(drw, scheme[SchemeSel2]);
-        else if (urg & 1 << i )
+        else if (urg & 1<<i)
             drw_setscheme(drw, scheme[SchemeUrgent]);
         else
             drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+
+		/* alternativetags, select to draw tags or tagsalt */
 		drw_text(drw, x, 0, w, bh, wdelta + lrpad / 2, (selmon->alttag ? tagsalt[i] : tags[i]), 0);
-		if (occ & 1 << i){
+		if (occ & 1<<i){
             /* Draw Notify */
             /* `sleep 3; echo -e "\a"` then switch to other tag */
             if (urg & 1 << i ) {
                 drw_setscheme(drw, scheme[SchemeNotify]);
+				/* activetagindicatorbar */
                 drw_rect(drw, x + boxw, 0, w - ( 2 * boxw ), boxw - 4, 1, 0);
             }
 			drw_setscheme(drw, scheme[
@@ -1039,6 +1048,7 @@ drawbar(Monitor *m)
 		}
 		x += w;
 	}
+
     /* Draw Layout icon: tile, monocle... */
 	w = blw = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeLt]);
@@ -1060,6 +1070,8 @@ drawbar(Monitor *m)
 					scm = SchemeNorm;
 				drw_setscheme(drw, scheme[scm]);
 
+				/* tabw has 1 added to it, so the function here is to make the remainder evenly distributed to the first N(N equal remainder) tabs */
+				/* and the width of the remaining tabs will be (tabw-1) */
 				if (remainder >= 0) {
 					if (remainder == 0) {
 						tabw--;
@@ -1512,6 +1524,8 @@ monocle(Monitor *m)
 	for (c = m->clients; c; c = c->next)
 		if (ISVISIBLE(c))
 			n++;
+	if (n > 0) /* override layout symbol */
+		snprintf(m->ltsymbol, sizeof m->ltsymbol, "[%d]", n);
 	for (c = nexttiled(m->clients); c; c = nexttiled(c->next))
 		resize(c, m->wx, m->wy, m->ww - 2 * c->bw, m->wh - 2 * c->bw, 0);
 }
@@ -2168,6 +2182,21 @@ seturgent(Client *c, int urg)
 	wmh->flags = urg ? (wmh->flags | XUrgencyHint) : (wmh->flags & ~XUrgencyHint);
 	XSetWMHints(dpy, c->win, wmh);
 	XFree(wmh);
+}
+
+static void
+focusurgent(const Arg *arg) {
+	Client *c;
+	int i;
+	for(c=selmon->clients; c && !c->isurgent; c=c->next);
+	if(c) {
+		for(i=0; i < LENGTH(tags) && !((1 << i) & c->tags); i++);
+		if(i < LENGTH(tags)) {
+			const Arg a = {.ui = 1 << i};
+			view(&a);
+			focus(c);
+		}
+	}
 }
 
 void
@@ -2843,8 +2872,12 @@ updatewmhints(Client *c)
 		if (c == selmon->sel && wmh->flags & XUrgencyHint) {
 			wmh->flags &= ~XUrgencyHint;
 			XSetWMHints(dpy, c->win, wmh);
-		} else
+		} else {
 			c->isurgent = (wmh->flags & XUrgencyHint) ? 1 : 0;
+			/* urgentborder */
+			if (c->isurgent)
+				XSetWindowBorder(dpy, c->win, scheme[SchemeUrgent][ColBorder].pixel);
+		}
 		if (wmh->flags & InputHint)
 			c->neverfocus = !wmh->input;
 		else
