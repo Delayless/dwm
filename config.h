@@ -19,8 +19,8 @@ static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows sel
 static const unsigned int systrayspacing = 0;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray        = 1;     /* 0 means no systray */
-static const int showbar            = 1;        /* 0 means no bar */
-static const int topbar             = 0;        /* 0 means bottom bar */
+static const int showbar            = 0;        /* 0 means no bar */
+static const int topbar             = 1;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
 /* static const char *fonts[]          = {"Fantasque Sans Mono Nerd Font:size=15:antialias=true:autohint=true"}; */
 static const char *fonts[]          = {"FiraCode Nerd Font:size=15"};
@@ -94,7 +94,7 @@ static const Rule rules[] = {
 	{ "st-256color",           NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,           0,        -1 },
 	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          0,           0,        -1 },
-	{ "fluent-reader",         NULL,     NULL,           1 << 7,    0,          0,           0,        -1 },
+	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,           0,        -1 },
 	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,           0,        -1 },
 	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
@@ -122,6 +122,7 @@ static const Layout layouts[] = {
 	{ MODKEY|ControlMask,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
+#define HOLDKEY 0xffeb // 0 - disable; 0xffe9 - Mod1Mask; 0xffeb - Mod4Mask
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -134,7 +135,7 @@ static const char *browsercmd[]  = { "google-chrome-stable", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "138x40", NULL };
 static const char *screenshotcmd[] = { "flameshot", "gui", NULL };
-static const char *rofirun[] = { "rofi", "-show", "run", NULL };
+static const char *rofirun[] = { "rofi", "-show", "drun", NULL };
 static const char *rofiwindow[] = { "rofi", "-show", "combi", NULL };
 
 #include <X11/XF86keysym.h>
@@ -171,6 +172,7 @@ static Key keys[] = {
     { MODKEY|ControlMask,           XK_l,      spawn,          SHCMD("xtrlock") },
     { 0,                        XK_Print,      spawn,          {.v = screenshotcmd } },
     { MODKEY,              XK_apostrophe,      togglescratch,  {.v = scratchpadcmd } },
+	{ 0,                            HOLDKEY,   holdbar,        {0} },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },

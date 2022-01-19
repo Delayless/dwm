@@ -226,6 +226,7 @@ static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
+static void keyrelease(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
@@ -270,6 +271,7 @@ static void tagtoright(const Arg *arg);
 static void tile(Monitor *);
 static void togglealttag();
 static void togglebar(const Arg *arg);
+static void holdbar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void togglesticky(const Arg *arg);
 static void togglefullscr(const Arg *arg);
@@ -282,6 +284,7 @@ static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
 static void updatebarpos(Monitor *m);
+static void updateholdbarpos(Monitor *m);
 static void updatebars(void);
 static void updateclientlist(void);
 static int updategeom(void);
@@ -328,6 +331,7 @@ static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
+	[ButtonRelease] = keyrelease,
 	[ClientMessage] = clientmessage,
 	[ConfigureRequest] = configurerequest,
 	[ConfigureNotify] = configurenotify,
@@ -335,6 +339,7 @@ static void (*handler[LASTEvent]) (XEvent *) = {
 	[EnterNotify] = enternotify,
 	[Expose] = expose,
 	[FocusIn] = focusin,
+	[KeyRelease] = keyrelease,
 	[KeyPress] = keypress,
 	[MappingNotify] = mappingnotify,
 	[MapRequest] = maprequest,
@@ -357,21 +362,64 @@ static xcb_connection_t *xcon;
 /* configuration, allows nested code to access above variables */
 #include "config.h"
 
+static unsigned int scratchtag = 1 << LENGTH(tags);
+
 struct Pertag {
 	unsigned int curtag, prevtag; /* current and previous tag */
 	int nmasters[LENGTH(tags) + 1]; /* number of windows in master area */
 	float mfacts[LENGTH(tags) + 1]; /* mfacts per tag */
 	unsigned int sellts[LENGTH(tags) + 1]; /* selected layouts */
 	const Layout *ltidxs[LENGTH(tags) + 1][2]; /* matrix of tags and layouts indexes  */
-	int showbars[LENGTH(tags) + 1]; /* display bar for the current tag */
 };
-
-static unsigned int scratchtag = 1 << LENGTH(tags);
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 
 /* function implementations */
+void
+holdbar(const Arg *arg)
+{
+	if (selmon->showbar)
+		return;
+	selmon->showbar = 2;
+	updateholdbarpos(selmon);
+	XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
+}
+
+void
+keyrelease(XEvent *e)
+{
+	if (XEventsQueued(dpy, QueuedAfterReading)) {
+		XEvent ne;
+		XPeekEvent(dpy, &ne);
+
+		if (ne.type == KeyPress && ne.xkey.time == e->xkey.time &&
+				ne.xkey.keycode == e->xkey.keycode) {
+			XNextEvent(dpy, &ne);
+			return;
+		}
+	}
+	if (e->xkey.keycode == XKeysymToKeycode(dpy, HOLDKEY) && selmon->showbar == 2) {
+		selmon->showbar = 0;
+		updateholdbarpos(selmon);
+		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
+		arrange(selmon);
+	}
+}
+
+void
+updateholdbarpos(Monitor *m)
+{
+	m->wy = m->my;
+	m->wh = m->mh;
+	if (m->showbar) {
+		m->by = m->topbar ? m->wy : m->wy + m->wh - bh;
+		m->wy = m->topbar ? m->wy - bh + bh : m->wy;
+	} else {
+		m->by = -bh;
+	}
+}
+
 void
 applyrules(Client *c)
 {
@@ -877,10 +925,7 @@ createmon(void)
 		m->pertag->ltidxs[i][0] = m->lt[0];
 		m->pertag->ltidxs[i][1] = m->lt[1];
 		m->pertag->sellts[i] = m->sellt;
-
-		m->pertag->showbars[i] = m->showbar;
 	}
-
 	return m;
 }
 
@@ -2245,7 +2290,7 @@ togglealttag()
 void
 togglebar(const Arg *arg)
 {
-	selmon->showbar = selmon->pertag->showbars[selmon->pertag->curtag] = !selmon->showbar;
+	selmon->showbar = (selmon->showbar == 2 ? 1 : !selmon->showbar);
 	updatebarpos(selmon);
 	resizebarwin(selmon);
 	if (showsystray) {
@@ -2356,9 +2401,6 @@ toggleview(const Arg *arg)
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 		selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
-		if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-			togglebar(NULL);
 
 		focus(NULL);
 		arrange(selmon);
@@ -2841,9 +2883,6 @@ view(const Arg *arg)
 	selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag];
 	selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt];
 	selmon->lt[selmon->sellt^1] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt^1];
-
-	if (selmon->showbar != selmon->pertag->showbars[selmon->pertag->curtag])
-		togglebar(NULL);
 
 	focus(NULL);
 	arrange(selmon);
