@@ -1014,7 +1014,7 @@ drawbar(Monitor *m)
 
 	resizebarwin(m);
 	for (c = m->clients; c; c = c->next) {
-		if (ISVISIBLE(c))
+		if (!ISSKIP(c))
 			n++;
 		occ |= c->tags;
 		if (c->isurgent)
@@ -1064,7 +1064,7 @@ drawbar(Monitor *m)
 			int remainder = w % n;
 			int tabw = (1.0 / (double)n) * w + 1;
 			for (c = m->clients; c; c = c->next) {
-				if (!ISVISIBLE(c))
+				if (ISSKIP(c))
 					continue;
 				if (m->sel == c)
 					scm = SchemeTitle;
