@@ -87,16 +87,17 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class                   instance  title           tags mask  isfloating   monitor */
-	/* class                   instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-	{ "Gimp",                  NULL,     NULL,           0,         1,          0,           0,        -1 },
-	{ "Google-chrome",         NULL,     NULL,           1 << 3,    0,          0,          -1,        -1 },
-	{ "st-256color",           NULL,     NULL,           0,         0,          1,           0,        -1 },
-	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,           0,        -1 },
-	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          0,           0,        -1 },
-	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,           0,        -1 },
-	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,           0,        -1 },
-	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
+	/* class                   instance  title           tags mask  isfloating  isalwaysontop  isterminal  noswallow  monitor */
+	{ "Gimp",                  NULL,     NULL,           0,         1,          0,             0,           0,        -1 },
+	{ "Google-chrome",         NULL,     NULL,           1 << 3,    0,          0,             0,          -1,        -1 },
+	{ "st-256color",           NULL,     NULL,           0,         0,          0,             1,           0,        -1 },
+	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
+	{ NULL,                    NULL, "Listen1",          0,         1,          1,             0,           0,        -1 },
+	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          1,             0,           0,        -1 },
+	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,             0,           0,        -1 },
+	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
+	{ "rofi",                  NULL,     NULL,           0,         0,          1,             0,           0,        -1 },
+	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,             0,           1,        -1 }, /* xev */
 };
 
 /* layout(s) */
@@ -168,7 +169,7 @@ static Key keys[] = {
     { MODKEY,                  XK_Return,      spawn,          {.v = termcmd } },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
     /* { MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("netease-cloud-music") }, */
-    { MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("listen1") },
+    { MODKEY,                       XK_m,      spawn,          SHCMD("listen1") },
     { MODKEY|ControlMask,           XK_l,      spawn,          SHCMD("xtrlock") },
     { 0,                        XK_Print,      spawn,          {.v = screenshotcmd } },
     { MODKEY,              XK_apostrophe,      togglescratch,  {.v = scratchpadcmd } },
@@ -191,7 +192,7 @@ static Key keys[] = {
 	{ MODKEY,                       XK_u,      focusurgent,    {0} },
 	{ MODKEY,                       XK_t,      setlayout,      {.v = &layouts[0]} },
 	{ MODKEY|ShiftMask,             XK_f,      setlayout,      {.v = &layouts[1]} },
-	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} },
+	{ MODKEY|ShiftMask,             XK_m,      setlayout,      {.v = &layouts[2]} },
 	{ MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} },
 	{ MODKEY|ShiftMask,             XK_t,      setlayout,      {.v = &layouts[4]} },
 	{ MODKEY|ControlMask,           XK_t,      setlayout,      {.v = &layouts[5]} },
@@ -202,6 +203,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY|ShiftMask,             XK_s,      togglesticky,   {0} },
+	{ MODKEY,                       XK_s,      toggleskipping, {0} },
+	{ MODKEY,                       XK_s,      togglealwaysontop, {0} },
 	{ MODKEY,                       XK_h,      viewtoleft,     {0} },
 	{ MODKEY,                       XK_l,      viewtoright,    {0} },
 	{ MODKEY|ShiftMask,             XK_h,      tagtoleft,      {0} },

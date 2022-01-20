@@ -56,6 +56,7 @@
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
 #define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+#define ISSKIP(C)               (!ISVISIBLE(C) || C->isskipping)
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
@@ -118,7 +119,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, issticky, isterminal, noswallow;
+	int isfixed, isfloating, isalwaysontop, isskipping, isurgent, neverfocus, oldstate, isfullscreen, issticky, isterminal, noswallow;
 	pid_t pid;
 	Client *next;
 	Client *snext;
@@ -175,6 +176,7 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	int isfloating;
+	int isalwaysontop;
 	int isterminal;
 	int noswallow;
 	int monitor;
@@ -273,6 +275,8 @@ static void togglealttag();
 static void togglebar(const Arg *arg);
 static void holdbar(const Arg *arg);
 static void togglefloating(const Arg *arg);
+static void toggleskipping(const Arg *arg);
+static void togglealwaysontop(const Arg *arg);
 static void togglesticky(const Arg *arg);
 static void togglefullscr(const Arg *arg);
 static void togglescratch(const Arg *arg);
@@ -445,6 +449,7 @@ applyrules(Client *c)
 			c->isterminal = r->isterminal;
 			c->noswallow  = r->noswallow;
 			c->isfloating = r->isfloating;
+			c->isalwaysontop = r->isalwaysontop;
 			c->tags |= r->tags;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
@@ -1076,6 +1081,8 @@ drawbar(Monitor *m)
 					remainder--;
 				}
 				drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+				if (c->isalwaysontop)
+					drw_rect(drw, x + boxs, bh - boxw, boxw, boxw, 0, 0);
 				x += tabw;
 			}
 		} else {
@@ -1210,16 +1217,16 @@ focusstack(const Arg *arg)
 	if (!selmon->sel || selmon->sel->isfullscreen)
 		return;
 	if (arg->i > 0) {
-		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
+		for (c = selmon->sel->next; c && ISSKIP(c); c = c->next);
 		if (!c)
-			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
+			for (c = selmon->clients; c && ISSKIP(c); c = c->next);
 	} else {
 		for (i = selmon->clients; i != selmon->sel; i = i->next)
-			if (ISVISIBLE(i))
+			if (!ISSKIP(i))
 				c = i;
 		if (!c)
 			for (; i; i = i->next)
-				if (ISVISIBLE(i))
+				if (!ISSKIP(i))
 					c = i;
 	}
 	if (c) {
@@ -1833,6 +1840,15 @@ restack(Monitor *m)
 		return;
 	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
 		XRaiseWindow(dpy, m->sel->win);
+
+	/* raise the isalwaysontop window */
+	for(c = m->clients; c; c = c->next) {
+		if(c->isalwaysontop) {
+			XRaiseWindow(dpy, c->win);
+			break;
+		}
+	}
+
 	if (m->lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
@@ -2332,6 +2348,37 @@ togglefloating(const Arg *arg)
 	if (selmon->sel->isfloating)
 		resize(selmon->sel, selmon->sel->x, selmon->sel->y,
 			selmon->sel->w, selmon->sel->h, 0);
+	arrange(selmon);
+}
+
+void
+toggleskipping(const Arg *arg)
+{
+	if (!selmon->sel)
+		return;
+	selmon->sel->isskipping = !selmon->sel->isskipping;
+}
+
+void
+togglealwaysontop(const Arg *arg)
+{
+	if (!selmon->sel || !selmon->sel->next)
+		return;
+	if (selmon->sel->isfullscreen)
+		return;
+
+	if(selmon->sel->isalwaysontop){
+		selmon->sel->isalwaysontop = 0;
+	}else{
+		/* disable others */
+		for(Monitor *m = mons; m; m = m->next)
+			for(Client *c = m->clients; c; c = c->next)
+				c->isalwaysontop = 0;
+
+		/* turn on, make it float too */
+		selmon->sel->isfloating = 1;
+		selmon->sel->isalwaysontop = 1;
+	}
 	arrange(selmon);
 }
 
