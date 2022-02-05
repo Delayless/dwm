@@ -96,6 +96,7 @@ static const Rule rules[] = {
 	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          1,             0,           0,        -1 },
 	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,             0,           0,        -1 },
 	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
+	{  NULL,                   NULL,     "mutt",         1 << 5,    0,          0,             0,           0,        -1 },
 	{ "rofi",                  NULL,     NULL,           0,         0,          1,             0,           0,        -1 },
 	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,             0,           1,        -1 }, /* xev */
 };
@@ -124,6 +125,7 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 #define HOLDKEY 0xffeb // 0 - disable; 0xffe9 - Mod1Mask; 0xffeb - Mod4Mask
+#define HOLDKEY_R 0xffec
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
@@ -132,6 +134,7 @@ static const Layout layouts[] = {
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, topbar ? NULL : "-b", NULL };
 static const char *termcmd[]  = { "st", NULL };
+/* static const char *mailcmd[] = { "urxvtc", "-title", "mutt", "-e", "mutt", NULL }; */
 static const char *browsercmd[]  = { "google-chrome-stable", NULL };
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "st", "-t", scratchpadname, "-g", "138x40", NULL };
@@ -173,7 +176,8 @@ static Key keys[] = {
     { MODKEY|ControlMask,           XK_l,      spawn,          SHCMD("xtrlock") },
     { 0,                        XK_Print,      spawn,          {.v = screenshotcmd } },
     { MODKEY,              XK_apostrophe,      togglescratch,  {.v = scratchpadcmd } },
-	{ 0,                            HOLDKEY,   holdbar,        {0} },
+	{ 0,                         HOLDKEY,      holdbar,        {0} },
+	{ 0,                       HOLDKEY_R,      holdbar,        {0} },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },

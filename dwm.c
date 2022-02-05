@@ -403,7 +403,7 @@ keyrelease(XEvent *e)
 			return;
 		}
 	}
-	if (e->xkey.keycode == XKeysymToKeycode(dpy, HOLDKEY) && selmon->showbar == 2) {
+	if (((e->xkey.keycode==XKeysymToKeycode(dpy, HOLDKEY)) || (e->xkey.keycode==XKeysymToKeycode(dpy, HOLDKEY_R))) && selmon->showbar == 2) {
 		selmon->showbar = 0;
 		updateholdbarpos(selmon);
 		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
