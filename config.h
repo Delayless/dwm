@@ -94,6 +94,7 @@ static const Rule rules[] = {
 	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
 	{ NULL,                    NULL, "Listen1",          0,         1,          1,             0,           0,        -1 },
 	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          1,             0,           0,        -1 },
+	{ "KeePassXC",             NULL,     NULL,           1 << 5,    1,          0,             0,           0,        -1 },
 	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,             0,           0,        -1 },
 	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
 	{  NULL,                   NULL,     "mutt",         1 << 5,    0,          0,             0,           0,        -1 },
