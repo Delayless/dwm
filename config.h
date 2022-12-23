@@ -75,8 +75,8 @@ static const char *colors[][3]      = {
 };
 
 /* tagging */
-/*        嗢 */
-static const char *tags[] = { "\uf489", "\ue62b", "\uf7a3", "\uf268", "\uf1c1", "\uf198", "\uf886", "\ufa7b", "\uf019" };
+/*        嗢 */
+static const char *tags[] = { "\uf489", "\ue62b", "\uf7a3", "\uf268", "\uf886", "\uf198", "\uf1c1", "\ufa7b", "\uf019" };
  /* ❶ ❷ ❸ ❹ ❺ ❻ ❼ ❽ ❾ */
 /* static const char *tagsalt[] = { "\u2776", "\u2777", "\u2778", "\u2779", "\u277a", "\u277b", "\u277c", "\u277d", "\u277e" }; */
 /*          */
@@ -88,10 +88,11 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
 	/* class                   instance  title           tags mask  isfloating  isalwaysontop  isterminal  noswallow  monitor */
-	{ "Gimp",                  NULL,     NULL,           0,         1,          0,             0,           0,        -1 },
+	{ "Gimp",                  NULL,     NULL,           0,         0,          0,             0,           0,        -1 },
 	{ "Google-chrome",         NULL,     NULL,           1 << 3,    0,          0,             0,          -1,        -1 },
 	{ "st-256color",           NULL,     NULL,           0,         0,          0,             1,           0,        -1 },
-	{ "KeePassXC",             NULL,     NULL,           1 << 5,    0,          0,             0,           1,        -1 },
+	{ "KeePassXC",             NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
+	{ "zathura",               NULL,     NULL,           1 << 6,    0,          0,             0,           0,        -1 },
 	{ NULL,                    NULL, "Listen1",          0,         1,          1,             0,           1,        -1 },
 	{ NULL,                    NULL, "dragon",           0,         1,          1,             0,           1,        -1 },
 	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
