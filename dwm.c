@@ -1211,7 +1211,12 @@ focusmon(const Arg *arg)
 	if ((m = dirtomon(arg->i)) == selmon)
 		return;
 	unfocus(selmon->sel, 0);
+
+	if (selmon->showbar == 2) {
+		selmon->showbar = 0;
+	}
 	selmon = m;
+	holdbar(NULL);
 	focus(NULL);
 }
 
