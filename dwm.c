@@ -467,6 +467,14 @@ applyrules(Client *c)
 	if (ch.res_name)
 		XFree(ch.res_name);
 	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
+
+	for (c = selmon->clients; c; c = c->next) {
+		if (c->isfullscreen)
+			c->isfullscreen = 0;
+		if (c->isfloating && !(c->tags & scratchtag))
+			c->isfloating = 0;
+	}
+	arrange(selmon);
 }
 
 int
@@ -2336,8 +2344,6 @@ spawn(const Arg *arg)
 	if (arg->v == dmenucmd)
 		dmenumon[0] = '0' + selmon->num;
 	selmon->tagset[selmon->seltags] &= ~scratchtag;
-	if ((arg->v == termcmd) && selmon->sel && selmon->sel->isfullscreen)
-		return;
 	if (fork() == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
