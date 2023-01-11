@@ -2020,6 +2020,10 @@ sendmon(Client *c, Monitor *m)
 {
 	if (c->mon == m)
 		return;
+	if (c->isfullscreen)
+		setfullscreen(c, 0);
+	if (m->sel && m->sel->isfullscreen)
+		setfullscreen(m->sel, 0);
 	unfocus(c, 1);
 	detach(c);
 	detachstack(c);
