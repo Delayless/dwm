@@ -23,7 +23,7 @@ static const int showbar            = 0;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
 /* static const char *fonts[]          = {"Fantasque Sans Mono Nerd Font:size=15:antialias=true:autohint=true"}; */
-static const char *fonts[]          = {"FiraCode Nerd Font:size=15"};
+static const char *fonts[]          = {"FiraCode Nerd Font:size=9"};
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -95,9 +95,9 @@ static const Rule rules[] = {
 	{ "zathura",               NULL,     NULL,           1 << 6,    0,          0,             0,           0,        -1 },
 	{ NULL,                    NULL, "Listen1",          0,         1,          1,             0,           1,        -1 },
 	{ NULL,                    NULL, "dragon",           0,         1,          1,             0,           1,        -1 },
-	{ "listen1",               NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
-	{ "netease-cloud-music",   NULL,     NULL,           1 << 6,    1,          1,             0,           0,        -1 },
-	{ "fluent-reader",         NULL,     NULL,           1 << 7,    1,          0,             0,           0,        -1 },
+	{ "listen1",               NULL,     NULL,           1 << 4,    1,          0,             0,           0,        -1 },
+	{ "netease-cloud-music",   NULL,     NULL,           1 << 4,    1,          1,             0,           0,        -1 },
+	{ "fluent-reader",         NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
 	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
 	{  NULL,                   NULL,     "mutt",         1 << 5,    0,          0,             0,           0,        -1 },
 	{ "rofi",                  NULL,     NULL,           0,         0,          1,             0,           0,        -1 },
@@ -151,6 +151,8 @@ static Key keys[] = {
 	{ MODKEY,                       XK_d,      spawn,          {.v = rofirun } },
 	{ MODKEY,                       XK_w,      spawn,          {.v = rofiwindow } },
 	/* { 0,      XF86XK_AudioLowerVolume,      spawn,          SHCMD("amixer set Master 5%-") }, */
+	{ MODKEY|ControlMask|ShiftMask, XK_F12,    spawn,          SHCMD("reboot") },
+	{ MODKEY|ControlMask|ShiftMask, XK_r,      spawn,          SHCMD("reboot") },
 	/* { 0,      XF86XK_AudioRaiseVolume,      spawn,          SHCMD("amixer set Master 5%+") }, */
 	/* { 0,             XF86XK_AudioMute,      spawn,          SHCMD("amixer set Master toggle") }, */
 	{ 0,                XF86XK_AudioMute,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
@@ -159,15 +161,18 @@ static Key keys[] = {
 	{ MODKEY,                      XK_F1,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_toggle.sh --toggle") },
 	{ MODKEY,                      XK_F2,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_down.sh") },
 	{ MODKEY,                      XK_F3,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/volume_up.sh") },
-	{ MODKEY,                     XK_F11,      spawn,          SHCMD("brightnessctl set 10%-") },
-	{ MODKEY,                     XK_F12,      spawn,          SHCMD("brightnessctl set +10%") },
+	{ MODKEY,                      XK_F5,      spawn,          SHCMD("brightnessctl set 10%-") },
+	{ MODKEY,                      XK_F6,      spawn,          SHCMD("brightnessctl set +10%") },
+	/* { MODKEY,					XK_F5,      spawn,          SHCMD("xrandr --output eDP-1 --brightness 0.2") }, */
+	/* { MODKEY,					XK_F6,      spawn,          SHCMD("xrandr --output eDP-1 --brightness 0.8") }, */
 	{ 0,        XF86XK_MonBrightnessDown,      spawn,          SHCMD("brightnessctl set 10%-") },
 	{ 0,          XF86XK_MonBrightnessUp,      spawn,          SHCMD("brightnessctl set +10%") },
 	// Fn+F7 toggle airplane mode
 	{ 0,                   XF86XK_RFKill,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
-	{ MODKEY,                      XK_F7,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
-	{ MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") },
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b --unredir-if-possible --backend xr_glx_hybrid --vsync --use-damage --glx-no-stencil") },
+	{ MODKEY,                      XK_F8,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
+	/* { MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") }, */
+	{ MODKEY,                       XK_v,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/greenclipboard.sh") },
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b --backend xr_glx_hybrid --vsync --use-damage --glx-no-stencil") },
 	{ MODKEY,                       XK_p,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/wallpaper-change.sh") },
 	{ MODKEY,                       XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/qwerty.sh") },
 	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/colemak.sh") },
