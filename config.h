@@ -24,6 +24,7 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const Bool viewontag         = True;     /* Switch view on tag switch */
 /* static const char *fonts[]          = {"Fantasque Sans Mono Nerd Font:size=15:antialias=true:autohint=true"}; */
 static const char *fonts[]          = {"FiraCode Nerd Font:size=9"};
+/* static const char *fonts[]          = {"Source Han Serif CN:size=9"}; */
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -172,7 +173,7 @@ static Key keys[] = {
 	{ MODKEY,                      XK_F8,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
 	/* { MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") }, */
 	{ MODKEY,                       XK_v,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/greenclipboard.sh") },
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b --backend xr_glx_hybrid --vsync --use-damage --glx-no-stencil") },
+	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b --experimental-backends --config ~/.config/picom.conf") },
 	{ MODKEY,                       XK_p,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/wallpaper-change.sh") },
 	{ MODKEY,                       XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/qwerty.sh") },
 	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/colemak.sh") },
