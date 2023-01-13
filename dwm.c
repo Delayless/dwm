@@ -219,6 +219,7 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static void pointerfocuswin(Client *c);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
@@ -1232,6 +1233,7 @@ focusmon(const Arg *arg)
 	selmon = m;
 	holdbar(NULL);
 	focus(NULL);
+	pointerfocuswin(NULL);
 }
 
 void
@@ -1258,6 +1260,16 @@ focusstack(const Arg *arg)
 		focus(c);
 		restack(selmon);
 	}
+}
+
+void
+pointerfocuswin(Client *c)
+{
+    if (c) {
+        XWarpPointer(dpy, None, root, 0, 0, 0, 0, c->x + c->w / 2, c->y + c->h / 2);
+        focus(c);
+    } else
+        XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww / 2, selmon->wy + selmon->wh / 2);
 }
 
 Atom
@@ -2380,6 +2392,7 @@ tagmon(const Arg *arg)
 	if (!selmon->sel || !mons->next)
 		return;
 	sendmon(selmon->sel, dirtomon(arg->i));
+	pointerfocuswin(selmon->sel);
 }
 
 void
