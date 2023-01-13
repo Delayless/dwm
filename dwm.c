@@ -63,7 +63,7 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
-#define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+#define TEXTW(X,F)              (drw_fontset_getwidth(drw, (X),(F)) + lrpad)
 
 #define SYSTEM_TRAY_REQUEST_DOCK    0
 
@@ -651,7 +651,7 @@ buttonpress(XEvent *e)
 	if (ev->window == selmon->barwin) {
 		i = x = 0;
 		do
-			x += TEXTW(tags[i]);
+			x += TEXTW(tags[i],0);
 		while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
 			click = ClkTagBar;
@@ -659,7 +659,7 @@ buttonpress(XEvent *e)
 		} else if (ev->x < x + blw)
 			click = ClkLtSymbol;
 		/* 2px right padding */
-		else if (ev->x > selmon->ww - (int)TEXTW(stext) + lrpad - 2 - getsystraywidth())
+		else if (ev->x > selmon->ww - (int)TEXTW(stext, statusfontindex) + lrpad -2 - getsystraywidth())
 			click = ClkStatusText;
 		else {
 			x += blw;
@@ -1028,8 +1028,8 @@ drawbar(Monitor *m)
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeStatus]);
-		tw = TEXTW(stext) - lrpad / 2 + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
+		tw = TEXTW(stext, statusfontindex) - lrpad / 2 + 2; /* 2px right padding */
+		drw_text(drw, m->ww - tw - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0, statusfontindex);
 	}
 
 	resizebarwin(m);
@@ -1043,9 +1043,9 @@ drawbar(Monitor *m)
 	x = 0;
     /* Draw Tags */
 	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
+		w = TEXTW(tags[i], 0);
 		/* alternativetags */
-		wdelta = selmon->alttag ? abs(TEXTW(tags[i]) - TEXTW(tagsalt[i])) / 2 : -2;
+		wdelta = selmon->alttag ? abs(TEXTW(tags[i], 0) - TEXTW(tagsalt[i], 0)) / 2 : -2;
 
 		/* draw tags foreground colors */
         if ( m == selmon && selmon->sel && selmon->sel->tags & 1 << i && !(selmon->sel->tags & m->tagset[m->seltags] & 1 << i) )
@@ -1056,7 +1056,7 @@ drawbar(Monitor *m)
             drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 
 		/* alternativetags, select to draw tags or tagsalt */
-		drw_text(drw, x, 0, w, bh, wdelta + lrpad / 2, (selmon->alttag ? tagsalt[i] : tags[i]), 0);
+		drw_text(drw, x, 0, w, bh, wdelta + lrpad / 2, (selmon->alttag ? tagsalt[i] : tags[i]), 0, 0);
 		if (occ & 1<<i){
             /* Draw Notify */
             /* `sleep 3; echo -e "\a"` then switch to other tag */
@@ -1074,9 +1074,9 @@ drawbar(Monitor *m)
 	}
 
     /* Draw Layout icon: tile, monocle... */
-	w = blw = TEXTW(m->ltsymbol);
+	w = blw = TEXTW(m->ltsymbol, 0);
 	drw_setscheme(drw, scheme[SchemeLt]);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0, 0);
 
     /* Draw Title */
 	if ((w = m->ww - tw - stw - x) > bh) {
@@ -1100,7 +1100,7 @@ drawbar(Monitor *m)
 					}
 					remainder--;
 				}
-				drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0);
+				drw_text(drw, x, 0, tabw, bh, lrpad / 2, c->name, 0, 0);
 				if (c->isalwaysontop)
 					drw_rect(drw, x + boxs, bh - boxw, boxw, boxw, 0, 0);
 				x += tabw;
