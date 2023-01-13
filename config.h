@@ -16,7 +16,7 @@ static const unsigned int gappoh    = 5;       /* horiz outer gap between window
 static const unsigned int gappov    = 10;       /* vert outer gap between windows and screen edge */
 static const int smartgaps          = 1;        /* 1 means no outer gap when there is only one window */
 static const unsigned int systraypinning = 0;   /* 0: sloppy systray follows selected monitor, >0: pin systray to monitor X */
-static const unsigned int systrayspacing = 0;   /* systray spacing */
+static const unsigned int systrayspacing = 2;   /* systray spacing */
 static const int systraypinningfailfirst = 1;   /* 1: if pinning fails, display systray on the first monitor, False: display systray on the last monitor*/
 static const int showsystray        = 1;     /* 0 means no systray */
 static const int showbar            = 0;        /* 0 means no bar */
@@ -59,6 +59,8 @@ static const char col_gb_gray2[]    = "#928374";
 
 static const char col_gb_orange1[]  = "#d65d0e";
 static const char col_gb_orange2[]  = "#fe8019";
+static const unsigned int baralpha = 0xd0;
+static const unsigned int borderalpha = OPAQUE;
 // gruvbox
 static const char *colors[][3]      = {
 	/*                      fg                 bg          border   */
@@ -73,6 +75,11 @@ static const char *colors[][3]      = {
 	[SchemeStatus]   = { col_gb_aqua2,     col_gb_bg,    col_gb_bg },
 	[SchemeIndOff]   = { col_gb_green2,    col_gb_bg,    col_gb_bg },
 	[SchemeIndOn]    = { col_gb_blue2,     col_gb_bg,    col_gb_bg },
+};
+static const unsigned int alphas[][3]      = {
+	/*               fg      bg        border     */
+	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
 };
 
 /* tagging */
