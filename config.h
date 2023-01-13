@@ -73,7 +73,7 @@ static const char *colors[][3]      = {
 	[SchemeTitle]    = { col_gb_fg,        col_gb_bg,    col_gb_bg },
 	[SchemeLt]       = { col_gb_orange2,   col_gb_bg,    col_gb_bg },
 	[SchemeNotify]   = { col_gb_red1,      col_gb_bg,    col_gb_bg },
-	[SchemeStatus]   = { col_gb_aqua2,     col_gb_bg,    col_gb_bg },
+	[SchemeStatus]   = { col_gb_orange1,   col_gb_bg,    col_gb_bg },
 	[SchemeIndOff]   = { col_gb_green2,    col_gb_bg,    col_gb_bg },
 	[SchemeIndOn]    = { col_gb_blue2,     col_gb_bg,    col_gb_bg },
 };
