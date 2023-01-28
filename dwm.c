@@ -1231,6 +1231,9 @@ focusmon(const Arg *arg)
 
 	if (selmon->showbar == 2) {
 		selmon->showbar = 0;
+		updateholdbarpos(selmon);
+		XMoveResizeWindow(dpy, selmon->barwin, selmon->wx, selmon->by, selmon->ww, bh);
+		arrange(selmon);
 	}
 	selmon = m;
 	holdbar(NULL);
@@ -2057,6 +2060,14 @@ sendmon(Client *c, Monitor *m)
 		setfullscreen(c, 0);
 	if (m->sel && m->sel->isfullscreen)
 		setfullscreen(m->sel, 0);
+
+	if (c->mon->showbar == 2) {
+		c->mon->showbar = 0;
+		updateholdbarpos(c->mon);
+		XMoveResizeWindow(dpy, c->mon->barwin, c->mon->wx, c->mon->by, c->mon->ww, bh);
+		arrange(c->mon);
+	}
+
 	unfocus(c, 1);
 	detach(c);
 	detachstack(c);
@@ -2067,6 +2078,7 @@ sendmon(Client *c, Monitor *m)
 	focus(c);
 	arrange(NULL);
 	restack(selmon);
+	holdbar(NULL);
 }
 
 void
