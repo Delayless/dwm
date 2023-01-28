@@ -65,7 +65,7 @@ static const unsigned int borderalpha = OPAQUE;
 // gruvbox
 static const char *colors[][3]      = {
 	/*                      fg                 bg          border   */
-	[SchemeHid]      = { col_cyan,         col_gray1,    col_border},
+	/* [SchemeHid]      = { col_cyan,         col_gray1,    col_border}, */
 	[SchemeNorm]     = { col_gb_gray2,     col_gb_bg,    col_gb_bg },
 	[SchemeSel]      = { col_gb_orange2,   col_gb_bg,    col_gb_orange2 },
 	[SchemeSel2]     = { col_gb_fg,        col_gb_bg,    col_gb_bg },
@@ -79,8 +79,16 @@ static const char *colors[][3]      = {
 };
 static const unsigned int alphas[][3]      = {
 	/*               fg      bg        border     */
-	[SchemeNorm] = { OPAQUE, baralpha, borderalpha },
-	[SchemeSel]  = { OPAQUE, baralpha, borderalpha },
+	[SchemeNorm]     = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel]      = { OPAQUE, baralpha, borderalpha },
+	[SchemeSel2]     = { OPAQUE, baralpha, borderalpha },
+	[SchemeUrgent]   = { OPAQUE, baralpha, borderalpha },
+	[SchemeTitle]    = { OPAQUE, baralpha, borderalpha },
+	[SchemeLt]       = { OPAQUE, baralpha, borderalpha },
+	[SchemeNotify]   = { OPAQUE, baralpha, borderalpha },
+	[SchemeStatus]   = { OPAQUE, baralpha, borderalpha },
+	[SchemeIndOff]   = { OPAQUE, baralpha, borderalpha },
+	[SchemeIndOn]    = { OPAQUE, baralpha, borderalpha },
 };
 
 /* tagging */
