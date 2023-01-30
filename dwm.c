@@ -62,6 +62,7 @@
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
+// TAGMASK为11111111
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
 #define TEXTW(X,F)              (drw_fontset_getwidth(drw, (X),(F)) + lrpad)
 
@@ -119,13 +120,13 @@ struct Client {
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int bw, oldbw;
-	unsigned int tags;
+	unsigned int tags; ///* 当前窗口的所有tag,比如当前窗口同时在TAG 1和3显示，则tags低8位为00001010 <11-01-23, Delayless> */
 	int isfixed, isfloating, isalwaysontop, isskipping, isurgent, neverfocus, oldstate, isfullscreen, issticky, isterminal, noswallow;
 	pid_t pid;
-	Client *next;
+	Client *next;  // 当前窗口当前(好像是所有tag内的client组成链表)tag的下一个窗口
 	Client *snext;
 	Client *swallowing;
-	Monitor *mon;
+	Monitor *mon;  // 当前窗口所在的屏幕
 	Window win;
 };
 
@@ -156,17 +157,17 @@ struct Monitor {
 	int gappiv;           /* vertical gap between windows */
 	int gappoh;           /* horizontal outer gaps */
 	int gappov;           /* vertical outer gaps */
-	unsigned int seltags;
+	unsigned int seltags; /* 0或1,用于索引tagset,具体作用见tagset[2]  <11-01-23, Delayless> */
 	unsigned int sellt;
-	unsigned int tagset[2];
+	unsigned int tagset[2]; // 定义长度为2的tagset是为了保存上一次的tagset,用于Alt+Tab在最近的两种Tag状态切换
 	int showbar;
 	int topbar;
-	Client *clients;
-	Client *sel;
-	Client *stack;
+	Client *clients;  // 当前屏幕，当前tag的所有窗口组成的链表
+	Client *sel;      /* 保存的当前屏幕中被选择的client(windows) <11-01-23, Delayless> */
+	Client *stack;    // 保存当前屏幕所有tags中所有窗口(client/window)组成的链表
 	Monitor *next;
 	Window barwin;
-	const Layout *lt[2];
+	const Layout *lt[2]; // 存储当前和上一次的layout值
 	Pertag *pertag;
 	unsigned int alttag;
 };
@@ -326,7 +327,7 @@ static Client *termforwin(const Client *c);
 static pid_t winpid(Window w);
 
 /* variables */
-static Systray *systray =  NULL;
+static Systray *systray =  NULL; /* 保存systray的窗口大小和图标组成的链表 */
 static const char autostartblocksh[] = "autostart_blocking.sh";
 static const char autostartsh[] = "autostart.sh";
 static const char broken[] = "broken";
@@ -366,7 +367,7 @@ static Cur *cursor[CurLast];
 static Clr **scheme;
 static Display *dpy;
 static Drw *drw;
-static Monitor *mons, *selmon;
+static Monitor *mons, *selmon; // mons保存所有屏幕组成链表，selmon则指向当前屏幕
 static Window root, wmcheckwin;
 
 static xcb_connection_t *xcon;
@@ -981,6 +982,10 @@ detach(Client *c)
 {
 	Client **tc;
 
+	// tc内保存的是下一个Client(windows)地址的内存单元
+	// 故*tc指向的就是下一个client(windows)
+	// 如果下一个Client为NULL或者是需要detach的窗口(Client *c)
+	// 就改变*tc的值，让tc指向NULL或者c的下一个窗口(c->next)
 	for (tc = &c->mon->clients; *tc && *tc != c; tc = &(*tc)->next);
 	*tc = c->next;
 }
@@ -1005,11 +1010,15 @@ dirtomon(int dir)
 	Monitor *m = NULL;
 
 	if (dir > 0) {
+		// 如果存在下一个屏幕，则赋值m为下一个屏幕，否则就让m为mons的头节点(第一块屏幕)
 		if (!(m = selmon->next))
 			m = mons;
 	} else if (selmon == mons)
+		// 如果当前屏幕selmon就是所有屏幕mons链表的头节点(第一块屏幕)时
+		// 找到最后一个mons的尾节点(最后一个屏幕)赋值给m返回
 		for (m = mons; m->next; m = m->next);
 	else
+		// 从mons头节点遍历，找到当前屏幕selmon的上一块屏幕
 		for (m = mons; m->next != selmon; m = m->next);
 	return m;
 }
@@ -1186,6 +1195,7 @@ void
 focus(Client *c)
 {
 	if (!c || !ISVISIBLE(c))
+		// 如果c为NULL或者不可见时(本来是ISVISIBLE，但不需要包括sticky的情况)
 		for (c = selmon->stack; c && (!(c->tags & c->mon->tagset[c->mon->seltags])); c = c->snext);
 	if (selmon->sel && selmon->sel != c) {
 		unfocus(selmon->sel, 0);
@@ -1434,6 +1444,7 @@ keypress(XEvent *e)
 		if (keysym == keys[i].keysym
 		&& CLEANMASK(keys[i].mod) == CLEANMASK(ev->state)
 		&& keys[i].func)
+			/* 按下按键后，通过函数指针执行相应函数 */
 			keys[i].func(&(keys[i].arg));
 }
 
@@ -2076,6 +2087,8 @@ sendmon(Client *c, Monitor *m)
 	attach(c);
 	attachstack(c);
 	focus(c);
+	/* TODO: 暂时修改的是focus里面，解决的存在全屏的问题，但是会造成所有全屏了的都被关闭了全屏
+	 * 例如当我在Tag 1打开浏览器时，本不需要关闭Tag 1里面窗口的全屏 <11-01-23, Delayless> */
 	arrange(NULL);
 	restack(selmon);
 	holdbar(NULL);
@@ -2360,6 +2373,12 @@ showhide(Client *c)
 		/* hide clients bottom up */
 		showhide(c->snext);
 		XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
+        /* 将client移动到屏幕之外, 左边的移动到屏幕左边以外，右边的client移动到屏幕右边以外 */
+        /* if (c->mon->mx == 0) { */
+        /*     XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y); */
+        /* } else { */
+        /*     XMoveWindow(dpy, c->win, c->mon->mx + c->mon->mw + WIDTH(c) * 1.5, c->y); */
+        /* } */
 	}
 }
 
@@ -2475,7 +2494,7 @@ togglefloating(const Arg *arg)
 {
 	if (!selmon->sel)
 		return;
-	if (selmon->sel->isfullscreen) /* no support for fullscreen windows */
+	if (selmon->sel->isfullscreen)
 		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
 	if (selmon->sel->isfloating)
@@ -2537,6 +2556,8 @@ togglescratch(const Arg *arg)
 	Client *c;
 	unsigned int found = 0;
 
+	// 遍历当前屏幕当前tags中的所有窗口(clients)，看是否有窗口是scratch
+	// /* TODO: 多屏幕共用一个scratch <30-01-23, Delayless> */
 	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
 	if (found) {
 		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
@@ -2550,6 +2571,7 @@ togglescratch(const Arg *arg)
 			restack(selmon);
 		}
 	} else
+		// 如果不存在scratch就新建一个
 		spawn(arg);
 }
 
