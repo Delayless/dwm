@@ -116,6 +116,7 @@ static const Rule rules[] = {
 	{ "netease-cloud-music",   NULL,     NULL,           1 << 4,    1,          1,             0,           0,        -1 },
 	{ "fluent-reader",         NULL,     NULL,           1 << 6,    1,          0,             0,           0,        -1 },
 	{ "Slack",                 NULL,     NULL,           1 << 5,    0,          0,             0,           0,        -1 },
+    { "float",                 NULL,     NULL,           0,         1,          0,             0,           0,        -1 },
 	{  NULL,                   NULL,     "mutt",         1 << 5,    0,          0,             0,           0,        -1 },
 	{ "rofi",                  NULL,     NULL,           0,         0,          1,             0,           0,        -1 },
 	{ NULL,                    NULL,     "Event Tester", 0,         0,          0,             0,           1,        -1 }, /* xev */
@@ -195,6 +196,7 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/colemak.sh") },
 	{ MODKEY|ShiftMask,            XK_F4,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/suspend.sh") },
     { MODKEY,                  XK_Return,      spawn,          {.v = termcmd } },
+    { MODKEY|ControlMask,      XK_Return,      spawn,          SHCMD("st -c float") },
     { MODKEY,                       XK_c,      spawn,          {.v = browsercmd } },
     /* { MODKEY|ShiftMask,             XK_m,      spawn,          SHCMD("netease-cloud-music") }, */
     { MODKEY,                       XK_m,      spawn,          SHCMD("listen1") },
