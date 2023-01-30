@@ -232,6 +232,7 @@ static void keypress(XEvent *e);
 static void keyrelease(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
+static void managefloating(Client *c);
 static void mappingnotify(XEvent *e);
 static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
@@ -1454,6 +1455,34 @@ killclient(const Arg *arg)
 }
 
 void
+managefloating(Client *c)
+{
+    Client *tc;
+    int d1 = 0, d2 = 0, tx, ty;
+    int tryed = 0;
+    while (tryed++ < 10) {
+        int dw, dh, existed = 0;
+        dw = (selmon->ww / 20) * d1, dh = (selmon->wh / 20) * d2;
+        tx = c->x + dw, ty = c->y + dh;
+        for (tc = selmon->clients; tc; tc = tc->next) {
+            if (ISVISIBLE(tc) && tc != c && tc->x == tx && tc->y == ty) {
+                existed = 1;
+                break;
+            }
+        }
+        if (!existed) {
+            c->x = tx;
+            c->y = ty;
+            break;
+        } else {
+            while (d1 == 0) d1 = rand()%7 - 3;
+            while (d2 == 0) d2 = rand()%7 - 3;
+        }
+    }
+}
+
+
+void
 manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, *t = NULL, *term = NULL;
@@ -1499,6 +1528,15 @@ manage(Window w, XWindowAttributes *wa)
 	}
 
 	wc.border_width = c->bw;
+
+    if (c->isfloating) {
+        if (wa->x==0 && wa->y==0) {
+            c->x = selmon->wx + (selmon->ww - c->w) / 2;
+            c->y = selmon->wy + (selmon->wh - c->h) / 2;
+        }
+        managefloating(c);
+    }
+
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
@@ -2480,6 +2518,7 @@ togglefloating(const Arg *arg)
     if (selmon->sel->isfloating) {
         selmon->sel->x = selmon->wx + selmon->ww / 6,
         selmon->sel->y = selmon->wy + selmon->wh / 6,
+        managefloating(selmon->sel);
         resize(selmon->sel, selmon->sel->x, selmon->sel->y, selmon->ww / 3 * 2, selmon->wh / 3 * 2, 0);
     }
 	arrange(selmon);
