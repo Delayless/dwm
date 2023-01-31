@@ -144,7 +144,7 @@ typedef struct {
 
 typedef struct Pertag Pertag;
 struct Monitor {
-	char ltsymbol[16];
+	char ltsymbol[16];   /* 当前显示器布局的图标 */
 	float mfact;
 	int nmaster;
 	int num;
@@ -157,8 +157,8 @@ struct Monitor {
 	int gappiv;           /* vertical gap between windows */
 	int gappoh;           /* horizontal outer gaps */
 	int gappov;           /* vertical outer gaps */
-	unsigned int seltags; /* 0或1,用于索引tagset,具体作用见tagset[2]  <11-01-23, Delayless> */
-	unsigned int sellt;
+	unsigned int seltags; /* tag的索引，0或1，用于索引tagset[2]，在本次和上次的tag之间切换，可参考tagset[2]注释  <11-01-23, Delayless> */
+	unsigned int sellt;   /* 布局的索引，0或1，用于索引lt[2]，通过sellt^1来保存本次和上次的布局到lt[2] */
 	unsigned int tagset[2]; // 定义长度为2的tagset是为了保存上一次的tagset,用于Alt+Tab在最近的两种Tag状态切换
 	int showbar;
 	int topbar;
@@ -566,6 +566,7 @@ arrange(Monitor *m)
 		arrangemon(m);
 }
 
+/* 调用布局函数，tile/monocle/bstack等 */
 void
 arrangemon(Monitor *m)
 {
@@ -2241,6 +2242,7 @@ void
 setlayout(const Arg *arg)
 {
 	Client *c;
+	/* TODO: 如果是打开浮动窗口，则接下来打开的软件都要以float类打开，就可以解决很多问题，比如大浮动窗口遮挡 <31-01-23, Delayless> */
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
 		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag] ^= 1;
 	if (arg && arg->v)
@@ -2253,7 +2255,7 @@ setlayout(const Arg *arg)
 			if (c->isfloating && !(c->tags & scratchtag))
 				c->isfloating = 0;
 		}
-		arrange(selmon);
+		arrange(selmon); // 调用布局函数，arrange --> arrangemon --> tile/monocle/bstack
 	}
 	else
 		drawbar(selmon);
@@ -2531,6 +2533,7 @@ togglefloating(const Arg *arg)
 {
 	if (!selmon->sel)
 		return;
+	/* TODO: 如果删除该语句，存在一个问题，全屏窗口切换浮动窗口时，会丢失其他窗口 <31-01-23, Delayless> */
 	if (selmon->sel->isfullscreen)
 		return;
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
