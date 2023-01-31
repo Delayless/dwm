@@ -570,9 +570,23 @@ arrange(Monitor *m)
 void
 arrangemon(Monitor *m)
 {
+	Client * c;
 	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
-	if (m->lt[m->sellt]->arrange)
+	if (m->lt[m->sellt]->arrange) {
 		m->lt[m->sellt]->arrange(m);
+	} else {
+		// floating mode
+		for (c=m->clients; c; c=c->next) {
+			c->isfloating = 1;
+			// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
+			if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
+				c->x = m->wx + m->ww / 6;
+				c->y = m->wy + m->wh / 6;
+				managefloating(c);
+				resize(c, c->x, c->y, m->ww / 3 * 2, m->wh / 3 * 2, 0);
+			}
+		}
+	}
 }
 
 void
