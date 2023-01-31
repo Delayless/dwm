@@ -191,6 +191,7 @@ struct Systray {
 };
 
 /* function declarations */
+static void logtofile(char log[100]);
 static void applyrules(Client *c);
 static int applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact);
 static void arrange(Monitor *m);
@@ -316,6 +317,7 @@ static int xerrordummy(Display *dpy, XErrorEvent *ee);
 static int xerrorstart(Display *dpy, XErrorEvent *ee);
 static void xinitvisual();
 static void zoom(const Arg *arg);
+static void savelog(const Arg *arg);
 static void bstack(Monitor *m);
 static void bstackhoriz(Monitor *m);
 
@@ -395,6 +397,14 @@ struct Pertag {
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
 
 /* function implementations */
+void
+logtofile(char log[100])
+{
+    char cmd [150];
+    sprintf(cmd, "echo '%s' >> /tmp/dwm.log", log);
+    system(cmd);
+}
+
 void
 holdbar(const Arg *arg)
 {
@@ -482,6 +492,9 @@ applyrules(Client *c)
 			c->isfullscreen = 0;
 		if (c->isfloating && !(c->tags & scratchtag))
 			c->isfloating = 0;
+		/* char str[100]; */
+		/* sprintf(str, "c->w: %d,  c->mon->mw*4/5: %d, c->isfloating: %d, !(c->tags & scratchtag): %d\n", c->w, c->mon->mw/5*4, c->isfloating, !(c->tags & scratchtag)); */
+		/* logtofile(str); */
 	}
 	arrange(selmon);
 }
@@ -3461,6 +3474,31 @@ zoom(const Arg *arg)
 		if (!c || !(c = nexttiled(c->next)))
 			return;
 	pop(c);
+}
+
+void
+savelog(const Arg *arg)
+{
+	Client * c;
+	char str[100];
+	int num;
+
+	num = 0;
+	for (c=selmon->stack; c; c=c->snext) {
+		sprintf(str, "stack snext: %d    %p", num++, c);
+		logtofile(str);
+	}
+
+	num = 0;
+	for (c=selmon->clients; c; c=c->snext) {
+		sprintf(str, "clients snext: %d    %p", num++, c);
+		logtofile(str);
+	}
+
+	sprintf(str, "selmon->sel: %p", selmon->sel);
+	logtofile(str);
+
+	logtofile("\n");
 }
 
 int
