@@ -1249,7 +1249,7 @@ focusmon(const Arg *arg)
 	selmon = m;
 	holdbar(NULL);
 	focus(NULL);
-	pointerfocuswin(NULL);
+	pointerfocuswin(selmon->sel);
 }
 
 void
