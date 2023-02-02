@@ -3564,26 +3564,26 @@ zoom(const Arg *arg)
 void
 savelog(const Arg *arg)
 {
-	Client * c;
+	/* Client * c; */
 	char str[100];
-	int num;
+	/* int num; */
 
-	num = 0;
-	for (c=selmon->stack; c; c=c->snext) {
-		sprintf(str, "stack snext: %d    %p", num++, c);
-		logtofile(str);
-	}
+	/* num = 0; */
+	/* for (c=selmon->stack; c; c=c->snext) { */
+	/* 	sprintf(str, "stack snext: %d    %p", num++, c); */
+	/* 	logtofile(str); */
+	/* } */
 
-	num = 0;
-	for (c=selmon->clients; c; c=c->snext) {
-		sprintf(str, "clients snext: %d    %p", num++, c);
-		logtofile(str);
-	}
+	/* num = 0; */
+	/* for (c=selmon->clients; c; c=c->snext) { */
+	/* 	sprintf(str, "clients snext: %d    %p", num++, c); */
+	/* 	logtofile(str); */
+	/* } */
 
-	sprintf(str, "selmon->sel: %p", selmon->sel);
+	/* sprintf(str, "selmon->sel: %p", selmon->sel); */
 	logtofile(str);
 
-	logtofile("\n");
+	/* logtofile("\n"); */
 }
 
 int
