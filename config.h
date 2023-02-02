@@ -190,6 +190,7 @@ static Key keys[] = {
 	{ MODKEY,                      XK_F8,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/network_toggle.sh") },
 	/* { MODKEY|ShiftMask,             XK_d,      spawn,          SHCMD("rofi -show combi") }, */
 	{ MODKEY,                       XK_v,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/greenclipboard.sh") },
+    { MODKEY|ControlMask,           XK_q,      spawn,          SHCMD("kill -9 $(xprop | grep _NET_WM_PID | awk '{print $3}')") },
 	{ MODKEY|ShiftMask,             XK_p,      spawn,          SHCMD("pkill picom; sleep 0.5; picom -b --experimental-backends --config ~/.config/picom.conf") },
 	{ MODKEY,                       XK_p,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/wallpaper-change.sh") },
 	{ MODKEY,                       XK_y,      spawn,          SHCMD(STR(PROJECT_PATH)"/scripts/qwerty.sh") },
