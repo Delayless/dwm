@@ -1333,7 +1333,7 @@ void
 focus(Client *c)
 {
 	if (!c || !ISVISIBLE(c))
-		// 如果c为NULL或者不可见时(本来是ISVISIBLE，但不需要包括sticky的情况)
+		// 如果c为NULL或者不可见时(本来是ISVISIBLE(c)，但不需要包括sticky的情况)
 		for (c = selmon->stack; c && (!(c->tags & c->mon->tagset[c->mon->seltags])); c = c->snext);
 	if (selmon->sel && selmon->sel != c) {
 		unfocus(selmon->sel, 0);
@@ -2257,7 +2257,9 @@ sendmon(Client *c, Monitor *m)
 	detachstack(c);
 	if (c->tags & scratchtag) {
 		c->tags = scratchtag;
+		// 打开目标屏幕的scratchtag
 		m->tagset[m->seltags] |= scratchtag;
+		// 关闭当前屏幕的scratchtag
 		c->mon->tagset[c->mon->seltags] &= ~scratchtag;
 		c->x = m->wx + (m->ww / 2 - WIDTH(c) / 2);
 		c->y = m->wy + (m->wh / 2 - HEIGHT(c) / 2);
@@ -2750,7 +2752,9 @@ togglescratch(const Arg *arg)
 	// /* TODO: 多屏幕共用一个scratch <30-01-23, Delayless> */
 	for (c = selmon->clients; c && !(found = c->tags & scratchtag); c = c->next);
 	if (found) {
+		// 将scratchtag标志位取反，赋值给tagset
 		unsigned int newtagset = selmon->tagset[selmon->seltags] ^ scratchtag;
+		// 其实并不存在newtagset为0的情况，除非一个tag都没选中，这是不会发生的
 		if (newtagset) {
 			selmon->tagset[selmon->seltags] = newtagset;
 			focus(NULL);
@@ -2760,7 +2764,6 @@ togglescratch(const Arg *arg)
 			focus(c);
 			restack(selmon);
 		}
-		// 如果不存在scratch就新建一个
 	} else {
 		for (m = mons; m && !found; m = m->next) {
 			for (c = m->clients; c && !(found = c->tags & scratchtag); c = c->next);
@@ -2770,6 +2773,7 @@ togglescratch(const Arg *arg)
 			}
 		}
 		if (!found) {
+			// 如果不存在scratch就新建一个
 			spawn(arg);
 		}
 	}
