@@ -2255,8 +2255,16 @@ sendmon(Client *c, Monitor *m)
 	unfocus(c, 1);
 	detach(c);
 	detachstack(c);
+	if (c->tags & scratchtag) {
+		c->tags = scratchtag;
+		m->tagset[m->seltags] |= scratchtag;
+		c->mon->tagset[c->mon->seltags] &= ~scratchtag;
+		c->x = m->wx + (m->ww / 2 - WIDTH(c) / 2);
+		c->y = m->wy + (m->wh / 2 - HEIGHT(c) / 2);
+	} else {
+		c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
+	}
 	c->mon = m;
-	c->tags = m->tagset[m->seltags]; /* assign tags of target monitor */
 	attach(c);
 	attachstack(c);
 	focus(c);
@@ -2735,6 +2743,7 @@ void
 togglescratch(const Arg *arg)
 {
 	Client *c;
+	Monitor *m;
 	unsigned int found = 0;
 
 	// 遍历当前屏幕当前tags中的所有窗口(clients)，看是否有窗口是scratch
@@ -2751,9 +2760,19 @@ togglescratch(const Arg *arg)
 			focus(c);
 			restack(selmon);
 		}
-	} else
 		// 如果不存在scratch就新建一个
-		spawn(arg);
+	} else {
+		for (m = mons; m && !found; m = m->next) {
+			for (c = m->clients; c && !(found = c->tags & scratchtag); c = c->next);
+			if (found) {
+				sendmon(c, selmon);
+				pointerfocuswin(c);
+			}
+		}
+		if (!found) {
+			spawn(arg);
+		}
+	}
 }
 
 void
