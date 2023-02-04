@@ -221,6 +221,7 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static void floatingwin(Monitor *m);
 static void pointerfocuswin(Client *c);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
@@ -531,7 +532,7 @@ applysizehints(Client *c, int *x, int *y, int *w, int *h, int interact)
 		*h = bh;
 	if (*w < bh)
 		*w = bh;
-	if (resizehints || c->isfloating || !c->mon->lt[c->mon->sellt]->arrange) {
+	if (resizehints || c->isfloating || &floatingwin == c->mon->lt[c->mon->sellt]->arrange) {
 		/* see last two sentences in ICCCM 4.1.2.3 */
 		baseismin = c->basew == c->minw && c->baseh == c->minh;
 		if (!baseismin) { /* temporarily remove base dimensions */
@@ -575,29 +576,19 @@ arrange(Monitor *m)
 	if (m) {
 		arrangemon(m);
 		restack(m);
-	} else for (m = mons; m; m = m->next)
-		arrangemon(m);
+	} else {
+		for (m = mons; m; m = m->next)
+			arrangemon(m);
+	}
 }
 
 void
 arrangemon(Monitor *m)
 {
-	Client * c;
 	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
 	if (m->lt[m->sellt]->arrange) {
 		m->lt[m->sellt]->arrange(m);
-	} else {
-		// floating mode
-		for (c=m->clients; c; c=c->next) {
-			c->isfloating = 1;
 			// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
-			if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
-				c->x = m->wx + m->ww / 6;
-				c->y = m->wy + m->wh / 6;
-				managefloating(c);
-				resize(c, c->x, c->y, m->ww / 3 * 2, m->wh / 3 * 2, 0);
-			}
-		}
 	}
 }
 
@@ -913,7 +904,7 @@ configurerequest(XEvent *e)
 	if ((c = wintoclient(ev->window))) {
 		if (ev->value_mask & CWBorderWidth)
 			c->bw = ev->border_width;
-		else if (c->isfloating || !selmon->lt[selmon->sellt]->arrange) {
+		else if (c->isfloating || &floatingwin == selmon->lt[selmon->sellt]->arrange) {
 			m = c->mon;
 			if (ev->value_mask & CWX) {
 				c->oldx = c->x;
@@ -1405,6 +1396,20 @@ focusstack(const Arg *arg)
 }
 
 void
+floatingwin(Monitor *m) {
+	Client * c;
+	for (c=m->clients; c; c=c->next) {
+		c->isfloating = 1;
+		if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
+			c->x = m->wx + m->ww / 6;
+			c->y = m->wy + m->wh / 6;
+			managefloating(c);
+			resize(c, c->x, c->y, m->ww / 3 * 2, m->wh / 3 * 2, 0);
+		}
+	}
+}
+
+void
 pointerfocuswin(Client *c)
 {
     if (c) {
@@ -1807,10 +1812,10 @@ movemouse(const Arg *arg)
 				ny = selmon->wy;
 			else if (abs((selmon->wy + selmon->wh) - (ny + HEIGHT(c))) < snap)
 				ny = selmon->wy + selmon->wh - HEIGHT(c);
-			if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
+			if (!c->isfloating && &floatingwin != selmon->lt[selmon->sellt]->arrange
 			&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
 				togglefloating(NULL);
-			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+			if (&floatingwin == selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, 1);
 			break;
 		}
@@ -1948,7 +1953,7 @@ resizeclient(Client *c, int x, int y, int w, int h)
 	if (((nexttiled(c->mon->clients) == c && !nexttiled(c->next))
 	    || &monocle == c->mon->lt[c->mon->sellt]->arrange)
 	    && !c->isfullscreen && !c->isfloating
-	    && NULL != c->mon->lt[c->mon->sellt]->arrange) {
+	    && &floatingwin != c->mon->lt[c->mon->sellt]->arrange) {
 		c->w = wc.width += c->bw * 2;
 		c->h = wc.height += c->bw * 2;
 		wc.border_width = 0;
@@ -1978,7 +1983,7 @@ resizemouse(const Arg *arg)
 		None, cursor[CurResize]->cursor, CurrentTime) != GrabSuccess)
 		return;
 
-	if (c->isfloating || NULL == c->mon->lt[c->mon->sellt]->arrange) {
+	if (c->isfloating || &floatingwin == c->mon->lt[c->mon->sellt]->arrange) {
 		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	} else {
 		XWarpPointer(dpy, None, root, 0, 0, 0, 0,
@@ -2003,13 +2008,13 @@ resizemouse(const Arg *arg)
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
 
-			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
+			if (&floatingwin == selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, c->x, c->y, nw, nh, 1);
 			break;
 		}
 	} while (ev.type != ButtonRelease);
 
-	if (c->isfloating || NULL == c->mon->lt[c->mon->sellt]->arrange) {
+	if (c->isfloating || &floatingwin == c->mon->lt[c->mon->sellt]->arrange) {
 		XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	} else {
 		selmon->mfact = (double) (ev.xmotion.x_root - selmon->mx) / (double) selmon->ww;
@@ -2052,7 +2057,7 @@ restack(Monitor *m)
 	drawbar(m);
 	if (!m->sel)
 		return;
-	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+	if (m->sel->isfloating || &floatingwin == m->lt[m->sellt]->arrange)
 		XRaiseWindow(dpy, m->sel->win);
 
 	/* raise the isalwaysontop window */
@@ -2063,7 +2068,7 @@ restack(Monitor *m)
 		}
 	}
 
-	if (m->lt[m->sellt]->arrange) {
+	if (&floatingwin != m->lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
 		for (c = m->stack; c; c = c->snext)
@@ -2396,7 +2401,7 @@ setmfact(const Arg *arg)
 {
 	float f;
 
-	if (!arg || !selmon->lt[selmon->sellt]->arrange)
+	if (!arg || &floatingwin == selmon->lt[selmon->sellt]->arrange)
 		return;
 	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
 	if (f < 0.05 || f > 0.95)
@@ -2534,7 +2539,7 @@ showhide(Client *c)
 	if (ISVISIBLE(c)) {
 		/* show clients top down */
 		XMoveWindow(dpy, c->win, c->x, c->y);
-		if ((!c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen) {
+		if ((&floatingwin == c->mon->lt[c->mon->sellt]->arrange || c->isfloating) && !c->isfullscreen) {
 			resize(c, c->x, c->y, c->w, c->h, 0);
 		}
 		showhide(c->snext);
@@ -3571,7 +3576,7 @@ zoom(const Arg *arg)
 {
 	Client *c = selmon->sel;
 
-	if (!selmon->lt[selmon->sellt]->arrange
+	if (&floatingwin == selmon->lt[selmon->sellt]->arrange
 	|| (selmon->sel && selmon->sel->isfloating))
 		return;
 	if (c == nexttiled(selmon->clients))
