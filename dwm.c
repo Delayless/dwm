@@ -2405,7 +2405,7 @@ setlayout(const Arg *arg)
 	if (selmon->sel) {
 		for (c = selmon->clients; c; c = c->next) {
 			if (c->isfullscreen)
-				c->isfullscreen = 0;
+				setfullscreen(c, 0);
 			if (c->isfloating && !(c->tags & scratchtag))
 				c->isfloating = 0;
 		}
