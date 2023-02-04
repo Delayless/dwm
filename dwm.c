@@ -1665,7 +1665,7 @@ manage(Window w, XWindowAttributes *wa)
 
 	wc.border_width = c->bw;
 
-    if (c->isfloating) {
+    if (c->isfloating || &floatingwin == c->mon->lt[c->mon->sellt]->arrange) {
         if (wa->x==0 && wa->y==0) {
             c->x = selmon->wx + (selmon->ww - c->w) / 2;
             c->y = selmon->wy + (selmon->wh - c->h) / 2;
