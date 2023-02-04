@@ -131,7 +131,7 @@ static const Layout layouts[] = {
 	/* symbol     arrange function */
 	/*      﩯 響☰ */
 	{ "\uf04c",    tile },    /* first entry is default */
-	{ "\uf2d2",    NULL },    /* no layout function means floating behavior */
+	{ "\uf2d2",    floatingwin },    /* no layout function means floating behavior */
 	{ "\uf2d0",    monocle },
 	{ "\ufa6f",    gaplessgrid },
 	{ "\ufa69",    bstack },
