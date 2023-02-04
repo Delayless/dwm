@@ -119,7 +119,7 @@ struct Client {
 	int x, y, w, h;
 	int oldx, oldy, oldw, oldh;
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int bw, oldbw;
+	int bw, oldbw; // border width，边框宽度
 	unsigned int tags; ///* 当前窗口的所有tag,比如当前窗口同时在TAG 1和3显示，则tags低8位为00001010 <11-01-23, Delayless> */
 	int isfixed, isfloating, isalwaysontop, isskipping, isurgent, neverfocus, oldstate, isfullscreen, issticky, isterminal, noswallow;
 	pid_t pid;
@@ -152,7 +152,7 @@ struct Monitor {
 	int btw;              /* width of tasks portion of bar */
 	int bt;               /* number of tasks */
 	int mx, my, mw, mh;   /* screen size */
-	int wx, wy, ww, wh;   /* window area  */
+	int wx, wy, ww, wh;   /* window area, wx,wy就是所有屏幕组成的overview中当前屏幕的坐标  */
 	int gappih;           /* horizontal gap between windows */
 	int gappiv;           /* vertical gap between windows */
 	int gappoh;           /* horizontal outer gaps */
@@ -589,8 +589,8 @@ arrangemon(Monitor *m)
 {
 	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
 	if (m->lt[m->sellt]->arrange) {
+		// 调用布局函数
 		m->lt[m->sellt]->arrange(m);
-			// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
 	}
 }
 
@@ -1409,8 +1409,11 @@ focusstack(const Arg *arg)
 void
 floatingwin(Monitor *m) {
 	Client * c;
+	// 程序里的arrange(NULL)好像不用变动
 	for (c=m->clients; c; c=c->next) {
 		c->isfloating = 1;
+		// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
+		// 否则在floating模式下无法全屏
 		if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
 			c->x = m->wx + m->ww / 6;
 			c->y = m->wy + m->wh / 6;
@@ -2564,7 +2567,7 @@ showhide(Client *c)
 		/* hide clients bottom up */
 		showhide(c->snext);
 		XMoveWindow(dpy, c->win, WIDTH(c) * -2, c->y);
-        /* 将client移动到屏幕之外, 左边的移动到屏幕左边以外，右边的client移动到屏幕右边以外 */
+		/* TODO: 将client移动到屏幕之外, 左边的移动到屏幕左边以外，右边的client移动到屏幕右边以外 <04-02-23, Delayless> */
         /* if (c->mon->mx == 0) { */
         /*     XMoveWindow(dpy, c->win, WIDTH(c) * -1.5, c->y); */
         /* } else { */
