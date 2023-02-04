@@ -2690,7 +2690,7 @@ togglefloating(const Arg *arg)
 		return;
 	/* TODO: 如果删除该语句，存在一个问题，全屏窗口切换浮动窗口时，会丢失其他窗口 <31-01-23, Delayless> */
 	if (selmon->sel->isfullscreen)
-		return;
+		setfullscreen(selmon->sel, 0);
 	selmon->sel->isfloating = !selmon->sel->isfloating || selmon->sel->isfixed;
     if (selmon->sel->isfloating) {
         selmon->sel->x = selmon->wx + selmon->ww / 6,
