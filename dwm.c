@@ -1413,8 +1413,8 @@ floatingwin(Monitor *m) {
 	for (c=m->clients; c; c=c->next) {
 		if (0 != (m->pertag->curtag & c->tags)) {
 			c->isfloating = 1;
-			// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
-			// 否则在floating模式下无法全屏
+			// 这里添加!c->isfullscreen的条件是为了解决调用setfullscreen时没反应的bug
+			// 如果不加该条件在floating模式下是无法全屏的
 			if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
 				c->x = m->wx + m->ww / 6;
 				c->y = m->wy + m->wh / 6;
