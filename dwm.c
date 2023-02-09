@@ -1411,14 +1411,16 @@ floatingwin(Monitor *m) {
 	Client * c;
 	// 程序里的arrange(NULL)好像不用变动
 	for (c=m->clients; c; c=c->next) {
-		c->isfloating = 1;
 		// !c->isfullscreen是当触发setfullscreen时不会又把尺寸改小
 		// 否则在floating模式下无法全屏
-		if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
-			c->x = m->wx + m->ww / 6;
-			c->y = m->wy + m->wh / 6;
-			managefloating(c);
-			resize(c, c->x, c->y, m->ww / 3 * 2, m->wh / 3 * 2, 0);
+		if (0 != (m->pertag->curtag & c->tags)) {
+			c->isfloating = 1;
+			if (c->isfloating && !c->isfullscreen && !(c->tags & scratchtag) && (c->w > c->mon->mw/4*3)) {
+				c->x = m->wx + m->ww / 6;
+				c->y = m->wy + m->wh / 6;
+				managefloating(c);
+				resize(c, c->x, c->y, m->ww / 3 * 2, m->wh / 3 * 2, 0);
+			}
 		}
 	}
 }
