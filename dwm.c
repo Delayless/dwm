@@ -2263,7 +2263,12 @@ sendmon(Client *c, Monitor *m)
 	attach(c);
 	attachstack(c);
 	focus(c);
-	arrange(NULL);
+	if (c->isfloating) {
+		c->x = m->wx + (m->ww / 2 - WIDTH(c) / 2);
+		c->y = m->wy + (m->wh / 2 - HEIGHT(c) / 2);
+        managefloating(c);
+	}
+	arrange(selmon);
 	restack(selmon);
 	holdbar(NULL);
 }
