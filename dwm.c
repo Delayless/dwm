@@ -2280,6 +2280,7 @@ sendmon(Client *c, Monitor *m)
 	attach(c);
 	attachstack(c);
 	focus(c);
+	arrange(NULL);
 	/* TODO: 暂时修改的是focus里面，解决的存在全屏的问题，但是会造成所有全屏了的都被关闭了全屏
 	 * 例如当我在Tag 1打开浏览器时，本不需要关闭Tag 1里面窗口的全屏 <11-01-23, Delayless> */
 	if (c->isfloating) {
