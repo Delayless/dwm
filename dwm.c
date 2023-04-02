@@ -1733,6 +1733,7 @@ mappingnotify(XEvent *e)
 		grabkeys();
 }
 
+// 事件触发，例如案件，移动鼠标等
 void
 maprequest(XEvent *e)
 {
@@ -2386,7 +2387,7 @@ setfullscreen(Client *c, int fullscreen)
 		c->isfloating = 1;
 		resizeclient(c, c->mon->mx, c->mon->my, c->mon->mw, c->mon->mh);
 		arrange(c->mon);
-		XRaiseWindow(dpy, c->win);
+		XRaiseWindow(dpy, c->win); // XRaiseWindow之后就可以覆盖bar,不然全屏之后上部分被覆盖了
 	} else if (!fullscreen && c->isfullscreen){
 		XChangeProperty(dpy, c->win, netatom[NetWMState], XA_ATOM, 32,
 			PropModeReplace, (unsigned char*)0, 0);
