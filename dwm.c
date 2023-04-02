@@ -609,7 +609,6 @@ attachstack(Client *c)
 void
 swallow(Client *p, Client *c)
 {
-
 	if (c->noswallow || c->isterminal)
 		return;
 	if (c->noswallow && !swallowfloating && c->isfloating)
@@ -1396,7 +1395,8 @@ focusstack(const Arg *arg)
 }
 
 void
-floatingwin(Monitor *m) {
+floatingwin(Monitor *m)
+{
 	Client * c;
 	for (c=m->clients; c; c=c->next) {
 		if (0 != (m->pertag->curtag & c->tags)) {
@@ -2074,7 +2074,7 @@ restack(Monitor *m)
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
 		for (c = m->stack; c; c = c->snext)
-			if (ISVISIBLE(c)) {
+			if (!c->isfloating && ISVISIBLE(c)) {
 				XConfigureWindow(dpy, c->win, CWSibling|CWStackMode, &wc);
 				wc.sibling = c->win;
 			}
@@ -2283,7 +2283,8 @@ setclientstate(Client *c, long state)
 }
 
 void
-tagtoleft(const Arg *arg) {
+tagtoleft(const Arg *arg)
+{
 	if(selmon->sel != NULL
 	&& __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
 	&& selmon->tagset[selmon->seltags] > 1) {
@@ -2294,7 +2295,8 @@ tagtoleft(const Arg *arg) {
 }
 
 void
-tagtoright(const Arg *arg) {
+tagtoright(const Arg *arg)
+{
 	if(selmon->sel != NULL
 	&& __builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
 	&& selmon->tagset[selmon->seltags] & (TAGMASK >> 1)) {
@@ -3298,7 +3300,8 @@ view(const Arg *arg)
 }
 
 void
-viewtoleft(const Arg *arg) {
+viewtoleft(const Arg *arg)
+{
 	if(__builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
 	&& selmon->tagset[selmon->seltags] > 1) {
 		selmon->seltags ^= 1; /* toggle sel tagset */
@@ -3309,7 +3312,8 @@ viewtoleft(const Arg *arg) {
 }
 
 void
-viewtoright(const Arg *arg) {
+viewtoright(const Arg *arg)
+{
 	if(__builtin_popcount(selmon->tagset[selmon->seltags] & TAGMASK) == 1
 	&& selmon->tagset[selmon->seltags] & (TAGMASK >> 1)) {
 		selmon->seltags ^= 1; /* toggle sel tagset */
