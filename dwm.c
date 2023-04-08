@@ -488,11 +488,9 @@ applyrules(Client *c)
 		XFree(ch.res_name);
 	c->tags = c->tags & TAGMASK ? c->tags & TAGMASK : c->mon->tagset[c->mon->seltags];
 
-	for (c = selmon->clients; c; c = c->next) {
-		if (c->isfullscreen)
-			c->isfullscreen = 0;
-		if (c->isfloating && !(c->tags & scratchtag))
-			c->isfloating = 0;
+	for (c = selmon->stack; c; c = c->next) {
+		if (c->isfullscreen && (c->tags & c->mon->tagset[c->mon->seltags]))
+			setfullscreen(c, 0);
 		/* char str[100]; */
 		/* sprintf(str, "c->w: %d,  c->mon->mw*4/5: %d, c->isfloating: %d, !(c->tags & scratchtag): %d\n", c->w, c->mon->mw/5*4, c->isfloating, !(c->tags & scratchtag)); */
 		/* logtofile(str); */
